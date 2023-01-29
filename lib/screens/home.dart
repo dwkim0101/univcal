@@ -64,6 +64,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       body: Container(
         color: const Color(0xFFF6FE63),
         child: TabBarView(
+          physics: const NeverScrollableScrollPhysics(),
           controller: _tabController,
           children: const [
             TimeTable(),
@@ -171,7 +172,7 @@ class _AnimatedTabBar extends State<AnimatedTabBar> {
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(8),
                                     child: Container(
-                                      color: Colors.green.withOpacity(0.5),
+                                      color: Colors.blue.withOpacity(0.5),
                                       width: 16,
                                       height: 16,
                                     ),

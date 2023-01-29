@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:univcal/screens/home.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() {
   runApp(const MyApp());
+  initializeDateFormatting('ko-KR');
 }
 
 class MyApp extends StatelessWidget {
@@ -13,6 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'UnivCal',
+      locale: const Locale('kr'),
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
