@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:univcal/screens/calendar.dart';
-import 'package:univcal/screens/mypages.dart';
+import 'package:univcal/screens/timetable.dart';
+import 'package:univcal/screens/todo.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -47,11 +48,11 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: DecoratedBox(
-        decoration: const BoxDecoration(
-          color: Colors.transparent,
+        decoration: BoxDecoration(
+          color: Colors.grey.withOpacity(0.05),
           border: Border(
             top: BorderSide(
-              color: Colors.black,
+              color: Colors.black.withOpacity(0.0),
             ),
           ),
         ),
@@ -65,8 +66,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         child: TabBarView(
           controller: _tabController,
           children: const [
-            MyWidget(),
-            Icon(CupertinoIcons.gear),
+            TimeTable(),
+            TodoWidget(),
             CalendarEvents(),
             Icon(CupertinoIcons.gear),
           ],
@@ -111,7 +112,7 @@ class _AnimatedTabBar extends State<AnimatedTabBar> {
     });
   }
 
-  final tabHeight = 60.0;
+  final tabHeight = 70.0;
 
   @override
   Widget build(BuildContext context) {
