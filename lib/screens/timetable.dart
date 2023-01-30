@@ -10,10 +10,79 @@ class TimeTable extends StatefulWidget {
 }
 
 class _TimeTableState extends State<TimeTable> {
-  List week = ['월', '화', '수', '목', '금'];
+  List week = ['월', '화', '수', '목', '금', '토', '일'];
   var kColumnLength = 22;
   double kFirstColumnHeight = 20;
   double kBoxSize = 52;
+  //시간생성기
+  Expanded buildTimeColumn() {
+    return Expanded(
+      child: Column(
+        children: [
+          SizedBox(
+            height: kFirstColumnHeight,
+          ),
+          ...List.generate(
+            kColumnLength,
+            (index) {
+              if (index % 2 == 0) {
+                return const Divider(
+                  color: Colors.grey,
+                  height: 0,
+                );
+              }
+              return SizedBox(
+                height: kBoxSize,
+                child: Center(child: Text('${index ~/ 2 + 9}')),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  //날짜 생성기
+  List<Widget> buildDayColumn(int index) {
+    return [
+      const VerticalDivider(
+        color: Colors.grey,
+        width: 0,
+      ),
+      Expanded(
+        flex: 4,
+        child: Stack(
+          children: [
+            Column(
+              children: [
+                SizedBox(
+                  height: 20,
+                  child: Text(
+                    '${week[index]}',
+                  ),
+                ),
+                ...List.generate(
+                  kColumnLength,
+                  (index) {
+                    if (index % 2 == 0) {
+                      return const Divider(
+                        color: Colors.grey,
+                        height: 0,
+                      );
+                    }
+                    return SizedBox(
+                      height: kBoxSize,
+                      child: Container(),
+                    );
+                  },
+                ),
+              ],
+            )
+          ],
+        ),
+      ),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,6 +138,24 @@ class _TimeTableState extends State<TimeTable> {
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey),
                 borderRadius: BorderRadius.circular(12),
+              ),
+              child: Stack(
+                children: [
+                  Row(children: [
+                    buildTimeColumn(),
+                    for (int i = 0; i < 5; i++) ...buildDayColumn(i),
+                  ]),
+                  Positioned(
+                    left: 115,
+                    top: kFirstColumnHeight + kBoxSize / 2,
+                    height: kBoxSize + kBoxSize * 0.5,
+                    width: 100,
+                    child: Container(
+                      color: Colors.green,
+                      child: Text('asd'),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
