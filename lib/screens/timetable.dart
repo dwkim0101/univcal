@@ -10,171 +10,196 @@ class TimeTable extends StatefulWidget {
 }
 
 class _TimeTableState extends State<TimeTable> {
-  List week = ['월', '화', '수', '목', '금', '토', '일'];
-  var kColumnLength = 22;
-  double kFirstColumnHeight = 20;
-  double kBoxSize = 52;
-  //시간생성기
-  Expanded buildTimeColumn() {
-    return Expanded(
-      child: Column(
-        children: [
-          SizedBox(
-            height: kFirstColumnHeight,
-          ),
-          ...List.generate(
-            kColumnLength,
-            (index) {
-              if (index % 2 == 0) {
-                return const Divider(
-                  color: Colors.grey,
-                  height: 0,
-                );
-              }
-              return SizedBox(
-                height: kBoxSize,
-                child: Center(child: Text('${index ~/ 2 + 9}')),
-              );
-            },
-          ),
-        ],
+  static int defaultTimeValue = 2 * 7; //30분 단위
+  static int startTimeValue = 9; // Starts at 9 o'clock
+  final List<String> dateNameList = ['월', '화', '수', '목', '금'];
+  // ignore: prefer_final_fields
+  List<List<bool>> _timetableEventList = List.generate(
+      5, (index) => List.filled(defaultTimeValue, false, growable: true),
+      growable: false);
+  //0 - 월요일 => 4 - 금요일
+  _listUpdate() {
+    //TODO: make LIST UPDATE
+    _timetableEventList[1][2] = true;
+    _timetableEventList[1][1] = true;
+    // print(_timetableEventList);
+  }
+
+  Border _eventBlockBorderConstructor(int dateIndex, int timeIndex) {
+    return const Border(right: BorderSide(width: 1));
+    // return Border(bottom: ,top: ,);
+  }
+
+  _makeTableContainer() {
+    _listUpdate();
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.grey,
+        ),
+        // borderRadius: const BorderRadius.all(Radius.circular(5))
       ),
+      child: _makeInnerTable(),
     );
   }
 
-  //날짜 생성기
-  List<Widget> buildDayColumn(int index) {
-    return [
-      const VerticalDivider(
-        color: Colors.grey,
-        width: 0,
-      ),
-      Expanded(
-        flex: 4,
-        child: Stack(
+  _makeInnerTable() {
+    // _timetableEventList[1].add(true);
+    int size = 7;
+    for (int i = 0; i < _timetableEventList.length; i++) {
+      if (size < _timetableEventList[i].length) {
+        size = _timetableEventList[i].length;
+      }
+      print(_timetableEventList[i].length);
+    }
+    print(size);
+    const double firstBoxSize = 20.0;
+    const double defaultBoxSize = 50.0;
+
+    return Row(
+      children: [
+        Column(
           children: [
-            Column(
-              children: [
-                SizedBox(
-                  height: 20,
-                  child: Text(
-                    '${week[index]}',
+            const SizedBox(
+              //first Container
+              width: firstBoxSize,
+              height: firstBoxSize,
+              // decoration: BoxDecoration(
+              //   border: Border.all(
+              //     width: 0.5,
+              //     color: Colors.green,
+              //   ),
+              // ),
+            ),
+            ...List<Widget>.generate(size ~/ 2, (idx) {
+              return Container(
+                alignment: Alignment.topRight,
+                height: defaultBoxSize,
+                width: firstBoxSize,
+                decoration: const BoxDecoration(
+                  border: Border(
+                    top: BorderSide(width: 0.5),
+                    bottom: BorderSide(width: 0.5),
+                    left: BorderSide(width: 0.5),
+                    right: BorderSide(width: 1),
                   ),
                 ),
-                ...List.generate(
-                  kColumnLength,
-                  (index) {
-                    if (index % 2 == 0) {
-                      return const Divider(
-                        color: Colors.grey,
-                        height: 0,
-                      );
-                    }
-                    return SizedBox(
-                      height: kBoxSize,
-                      child: Container(),
-                    );
-                  },
+                child: Text(
+                  (idx + startTimeValue > 12
+                          ? idx + startTimeValue - 12
+                          : idx + startTimeValue)
+                      .toString(),
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ],
-            )
+              );
+            }, growable: true)
+                .toList(),
           ],
         ),
-      ),
-    ];
+        ...List<Widget>.generate(5, (dateIndex) {
+          return Expanded(
+            flex: 1,
+            child: Column(
+              children: [
+                Container(
+                  alignment: Alignment.center,
+                  width: double.infinity,
+                  height: firstBoxSize,
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      top: BorderSide(width: 0.5),
+                      bottom: BorderSide(width: 1),
+                      left: BorderSide(width: 0.5),
+                      right: BorderSide(width: 0.5),
+                    ),
+                  ),
+                  child: Text(
+                    dateNameList[dateIndex].toString(),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                ...List<Widget>.generate(size, (timeIndex) {
+                  return Container(
+                    height: defaultBoxSize / 2,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: _timetableEventList[dateIndex][timeIndex]
+                          ? Colors.blue
+                          : Colors.transparent,
+                      border:
+                          _eventBlockBorderConstructor(dateIndex, timeIndex),
+                    ),
+                  );
+                }),
+              ],
+            ),
+          );
+        }),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.zero,
-        child: AppBar(
-          elevation: 0,
-          systemOverlayStyle: SystemUiOverlayStyle.dark,
-          backgroundColor: Colors.green.withOpacity(0.0),
+        appBar: PreferredSize(
+          preferredSize: Size.zero,
+          child: AppBar(
+            elevation: 0,
+            systemOverlayStyle: SystemUiOverlayStyle.dark,
+            backgroundColor: Colors.green.withOpacity(0.0),
+          ),
         ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text(
-                      '2023년 1학기',
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                      ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Text(
+                          '2023년 1학기',
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          '시간표',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 25,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ],
                     ),
-                    Text(
-                      '시간표',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 25,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
+                    IconButton(
+                        onPressed: _listUpdate,
+                        icon: const Icon(CupertinoIcons.add_circled),
+                        iconSize: 35,
+                        color: Colors.blue.withOpacity(1)),
                   ],
                 ),
-                IconButton(
-                    onPressed: myfunction,
-                    icon: const Icon(CupertinoIcons.add_circled),
-                    iconSize: 35,
-                    color: Colors.blue.withOpacity(1)),
+                const SizedBox(
+                  height: 10,
+                ),
+                _makeTableContainer(),
               ],
             ),
-            const SizedBox(
-              height: 10,
-            ),
-            Container(
-              height: kColumnLength / 2 * kBoxSize + kColumnLength,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Stack(
-                children: [
-                  Row(children: [
-                    buildTimeColumn(),
-                    for (int i = 0; i < 5; i++) ...buildDayColumn(i),
-                  ]),
-                  Positioned(
-                    left: 115,
-                    top: kFirstColumnHeight + kBoxSize / 2,
-                    height: kBoxSize + kBoxSize * 0.5,
-                    width: 100,
-                    child: Container(
-                      color: Colors.green,
-                      child: Text('asd'),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-}
-
-myfunction() {
-  print('function');
 }
