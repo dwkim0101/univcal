@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../utils.dart';
@@ -10,7 +11,7 @@ class CalendarEvents extends StatefulWidget {
   const CalendarEvents({super.key});
 
   @override
-  _CalendarEventsState createState() => _CalendarEventsState();
+  State<CalendarEvents> createState() => _CalendarEventsState();
 }
 
 class _CalendarEventsState extends State<CalendarEvents> {
@@ -87,8 +88,13 @@ class _CalendarEventsState extends State<CalendarEvents> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('TableCalendar - Events'),
+      appBar: PreferredSize(
+        preferredSize: Size.zero,
+        child: AppBar(
+          elevation: 0,
+          systemOverlayStyle: SystemUiOverlayStyle.dark,
+          backgroundColor: Colors.green.withOpacity(0.0),
+        ),
       ),
       body: Column(
         children: [

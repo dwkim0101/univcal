@@ -17,12 +17,12 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       icon: Icon(CupertinoIcons.chart_pie),
     ),
     Tab(
-      text: '학습 & 복습',
-      icon: Icon(CupertinoIcons.pencil),
+      text: '학습',
+      icon: Icon(CupertinoIcons.pencil_circle),
     ),
     Tab(
-      text: '캘린더',
-      icon: Icon(CupertinoIcons.calendar),
+      text: '복습',
+      icon: Icon(CupertinoIcons.check_mark_circled),
     ),
     Tab(
       text: '설정',
@@ -68,8 +68,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           controller: _tabController,
           children: const [
             TimeTable(),
-            TodoWidget(),
             CalendarEvents(),
+            StudyReminderView(),
             Icon(CupertinoIcons.gear),
           ],
           // myTabs.map((Tab tab) {

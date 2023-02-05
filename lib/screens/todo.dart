@@ -1,28 +1,24 @@
 // Copyright 2019 Aleksander Woźniak
 // SPDX-License-Identifier: Apache-2.0
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:table_calendar/table_calendar.dart';
+import 'package:intl/intl.dart';
 
 import '../utils.dart';
 
-class TodoWidget extends StatefulWidget {
-  const TodoWidget({super.key});
+class StudyReminderView extends StatefulWidget {
+  const StudyReminderView({super.key});
 
   @override
-  _TodoWidgetState createState() => _TodoWidgetState();
+  State<StudyReminderView> createState() => _StudyReminderViewState();
 }
 
-class _TodoWidgetState extends State<TodoWidget> {
+class _StudyReminderViewState extends State<StudyReminderView> {
   late final ValueNotifier<List<Event>> _selectedEvents;
-  final CalendarFormat _calendarFormat = CalendarFormat.week;
-  RangeSelectionMode _rangeSelectionMode = RangeSelectionMode
-      .toggledOff; // Can be toggled on/off by longpressing a date
-  DateTime _focusedDay = DateTime.now();
+  final DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  DateTime? _rangeStart;
-  DateTime? _rangeEnd;
 
   @override
   void initState() {
@@ -39,50 +35,7 @@ class _TodoWidgetState extends State<TodoWidget> {
   }
 
   List<Event> _getEventsForDay(DateTime day) {
-    // Implementation example
     return kEvents[day] ?? [];
-  }
-
-  List<Event> _getEventsForRange(DateTime start, DateTime end) {
-    // Implementation example
-    final days = daysInRange(start, end);
-
-    return [
-      for (final d in days) ..._getEventsForDay(d),
-    ];
-  }
-
-  void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
-    if (!isSameDay(_selectedDay, selectedDay)) {
-      setState(() {
-        _selectedDay = selectedDay;
-        _focusedDay = focusedDay;
-        _rangeStart = null; // Important to clean those
-        _rangeEnd = null;
-        _rangeSelectionMode = RangeSelectionMode.toggledOff;
-      });
-
-      _selectedEvents.value = _getEventsForDay(selectedDay);
-    }
-  }
-
-  void _onRangeSelected(DateTime? start, DateTime? end, DateTime focusedDay) {
-    setState(() {
-      _selectedDay = null;
-      _focusedDay = focusedDay;
-      _rangeStart = start;
-      _rangeEnd = end;
-      _rangeSelectionMode = RangeSelectionMode.toggledOn;
-    });
-
-    // `start` or `end` could be null
-    if (start != null && end != null) {
-      _selectedEvents.value = _getEventsForRange(start, end);
-    } else if (start != null) {
-      _selectedEvents.value = _getEventsForDay(start);
-    } else if (end != null) {
-      _selectedEvents.value = _getEventsForDay(end);
-    }
   }
 
   @override
@@ -96,80 +49,173 @@ class _TodoWidgetState extends State<TodoWidget> {
           backgroundColor: Colors.green.withOpacity(0.0),
         ),
       ),
-      body: Column(
-        children: [
-          TableCalendar<Event>(
-            locale: 'ko-KR',
-            firstDay: kFirstDay,
-            lastDay: kLastDay,
-            focusedDay: _focusedDay,
-            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-            rangeStartDay: _rangeStart,
-            rangeEndDay: _rangeEnd,
-            calendarFormat: _calendarFormat,
-            rangeSelectionMode: _rangeSelectionMode,
-            eventLoader: _getEventsForDay,
-            calendarStyle: CalendarStyle(
-              selectedTextStyle: const TextStyle(color: Colors.black),
-              selectedDecoration: BoxDecoration(
-                color: Colors.transparent,
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.blue, width: 1.5),
+      body: Column(children: [
+        Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '복습',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 25,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 4,
+                  ),
+                  Text(
+                    DateFormat("MM월 dd일").format(DateTime.now()),
+                    style: const TextStyle(
+                      color: Colors.blue,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
-              weekendTextStyle: const TextStyle(color: Colors.grey),
-              todayDecoration: BoxDecoration(
-                color: Colors.transparent,
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.transparent, width: 1.5),
-              ),
-              isTodayHighlighted: false,
-              todayTextStyle: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.grey,
-              ),
-              markersMaxCount: 1,
-              // Use `CalendarStyle` to customize the UI
-              outsideDaysVisible: false,
-            ),
-            headerStyle: const HeaderStyle(
-              formatButtonVisible: false,
-              titleCentered: true,
-            ),
-            onDaySelected: _onDaySelected,
-            onRangeSelected: _onRangeSelected,
-            onPageChanged: (focusedDay) {
-              _focusedDay = focusedDay;
-            },
+              IconButton(
+                  onPressed: null,
+                  icon: const Icon(CupertinoIcons.add_circled),
+                  iconSize: 35,
+                  color: Colors.blue.withOpacity(1)),
+            ],
           ),
-          const SizedBox(height: 8.0),
-          Expanded(
-            child: ValueListenableBuilder<List<Event>>(
-              valueListenable: _selectedEvents,
-              builder: (context, value, _) {
-                return ListView.builder(
-                  itemCount: value.length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 12.0,
-                        vertical: 4.0,
+        ),
+        Expanded(
+          child: DefaultTabController(
+            length: 6,
+            child: Column(
+              children: <Widget>[
+                Container(
+                  color: Colors.blue,
+                  constraints: const BoxConstraints.expand(height: 50),
+                  child: TabBar(
+                      dividerColor: Colors.black,
+                      labelStyle: const TextStyle(
+                        fontSize: 10,
                       ),
-                      decoration: BoxDecoration(
-                        border: Border.all(),
-                        borderRadius: BorderRadius.circular(12.0),
+                      tabs: [
+                        Tab(
+                          text: DateFormat("MM월\ndd일").format(
+                              DateTime.now().add(const Duration(days: -60))),
+                        ),
+                        Tab(
+                          text: DateFormat("MM월\ndd일").format(
+                              DateTime.now().add(const Duration(days: -28))),
+                        ),
+                        Tab(
+                          text: DateFormat("MM월\ndd일").format(
+                              DateTime.now().add(const Duration(days: -14))),
+                        ),
+                        Tab(
+                          text: DateFormat("MM월\ndd일").format(
+                              DateTime.now().add(const Duration(days: -7))),
+                        ),
+                        Tab(
+                          text: DateFormat("MM월\ndd일").format(
+                              DateTime.now().add(const Duration(days: -3))),
+                        ),
+                        Tab(
+                          text: DateFormat("MM월\ndd일").format(
+                              DateTime.now().add(const Duration(days: -1))),
+                        ),
+                      ]),
+                ),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: TabBarView(children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          Container(
+                              alignment: Alignment.topLeft,
+                              child: const Text(
+                                '60일전 학습내용',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              )),
+                          Expanded(
+                            child: _getEventsForDay(_selectedDay!
+                                        .add(const Duration(days: 0)))
+                                    .isEmpty
+                                ? Container(
+                                    alignment: Alignment.topLeft,
+                                    child:
+                                        const Text('복습할 내용이 없습니다.'), //일정 없을 시
+                                  )
+                                : ValueListenableBuilder<List<Event>>(
+                                    valueListenable: ValueNotifier(
+                                        _getEventsForDay(_selectedDay!
+                                            .add(const Duration(days: 0)))),
+                                    builder: (context, value, _) {
+                                      return ListView.builder(
+                                        padding: const EdgeInsets.all(0),
+                                        itemCount: value.length,
+                                        itemBuilder: (context, index) {
+                                          return value.isEmpty
+                                              ? const Text('asd')
+                                              : Container(
+                                                  padding:
+                                                      const EdgeInsets.all(0),
+                                                  margin: const EdgeInsets
+                                                      .symmetric(
+                                                    vertical: 4.0,
+                                                  ),
+                                                  decoration:
+                                                      const BoxDecoration(
+                                                    border: Border(
+                                                        bottom: BorderSide()),
+                                                  ),
+                                                  child: ListTile(
+                                                    trailing: const Icon(
+                                                        CupertinoIcons.circle),
+                                                    onTap: () => print(
+                                                        '${value[index]}'),
+                                                    title: Text(
+                                                      '${value[index]}',
+                                                      style: const TextStyle(
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                  ),
+                                                );
+                                        },
+                                      );
+                                    },
+                                  ),
+                          ),
+                        ],
                       ),
-                      child: ListTile(
-                        onTap: () => print('${value[index]}'),
-                        title: Text('${value[index]}'),
-                      ),
-                    );
-                  },
-                );
-              },
+                    ),
+                    Container(
+                      child: const Text("Articles Body"),
+                    ),
+                    Container(
+                      child: const Text("User Body"),
+                    ),
+                    Container(
+                      child: const Text("User Body"),
+                    ),
+                    Container(
+                      child: const Text("User Body"),
+                    ),
+                    Container(
+                      child: const Text("User Body"),
+                    ),
+                  ]),
+                )
+              ],
             ),
           ),
-        ],
-      ),
+        )
+      ]),
     );
   }
 }
