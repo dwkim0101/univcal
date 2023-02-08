@@ -1,101 +1,100 @@
+// Copyright 2019 Aleksander Woźniak
+// SPDX-License-Identifier: Apache-2.0
+
+import 'dart:collection';
+import 'package:intl/intl.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:table_calendar/table_calendar.dart';
 
-class TimeTable extends StatefulWidget {
-  const TimeTable({super.key});
+import '../utils.dart';
+
+class CalendarEvents extends StatefulWidget {
+  const CalendarEvents({super.key});
 
   @override
-  State<TimeTable> createState() => _TimeTableState();
+  State<CalendarEvents> createState() => _CalendarEventsState();
 }
 
-class _TimeTableState extends State<TimeTable> {
-  final GlobalKey _viewKey = GlobalKey();
+class _CalendarEventsState extends State<CalendarEvents> {
+  late final ValueNotifier<List<Event>> _selectedEvents;
+  CalendarFormat _calendarFormat = CalendarFormat.twoWeeks;
+  final Set<DateTime> _selectedDays = LinkedHashSet<DateTime>(
+    equals: isSameDay,
+    hashCode: getHashCode,
+  );
 
-  Size _getSize(GlobalKey key) {
-    if (key.currentContext != null) {
-      final RenderBox renderBox =
-          key.currentContext!.findRenderObject() as RenderBox;
-      return renderBox.size;
-    }
-    return const Size(0, 0);
+  bool get canClearSelection =>
+      _selectedDays.isNotEmpty || _rangeStart != null || _rangeEnd != null;
+  late PageController _pageController;
+  // final ValueNotifier<DateTime> _focusedDay = ValueNotifier(DateTime.now());
+  RangeSelectionMode _rangeSelectionMode = RangeSelectionMode
+      .toggledOff; // Can be toggled on/off by longpressing a date
+  DateTime _focusedDay = DateTime.now();
+  DateTime? _selectedDay;
+  DateTime? _rangeStart;
+  DateTime? _rangeEnd;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _selectedDay = _focusedDay;
+    _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
   }
 
-  List week = ['월', '화', '수', '목', '금', '토', '일'];
-  var kColumnLength = 22;
-  double kFirstColumnHeight = 20;
-  double kBoxSize = 52;
-  //시간생성기
-  Expanded buildTimeColumn() {
-    return Expanded(
-      child: Column(
-        children: [
-          SizedBox(
-            height: kFirstColumnHeight,
-          ),
-          ...List.generate(
-            kColumnLength,
-            (index) {
-              if (index % 2 == 0) {
-                return const Divider(
-                  color: Colors.grey,
-                  height: 0,
-                );
-              }
-              return SizedBox(
-                height: kBoxSize,
-                child: Center(child: Text('${index ~/ 2 + 9}')),
-              );
-            },
-          ),
-        ],
-      ),
-    );
+  @override
+  void dispose() {
+    _selectedEvents.dispose();
+    super.dispose();
   }
 
-  //날짜 생성기
-  List<Widget> buildDayColumn(int index) {
+  List<Event> _getEventsForDay(DateTime day) {
+    // Implementation example
+    return kEvents[day] ?? [];
+  }
+
+  List<Event> _getEventsForRange(DateTime start, DateTime end) {
+    // Implementation example
+    final days = daysInRange(start, end);
+
     return [
-      const VerticalDivider(
-        color: Colors.grey,
-        width: 0,
-      ),
-      Expanded(
-        flex: 4,
-        child: Stack(
-          children: [
-            Column(
-              children: [
-                SizedBox(
-                  height: 20,
-                  child: Text(
-                    '${week[index]}',
-                  ),
-                ),
-                ...List.generate(
-                  kColumnLength,
-                  (index) {
-                    if (index % 2 == 0) {
-                      return const Divider(
-                        color: Colors.grey,
-                        height: 0,
-                      );
-                    }
-                    return SizedBox(
-                      height: kBoxSize,
-                      child: Container(
-                        decoration: const BoxDecoration(color: Colors.amber),
-                        child: const Text("asd"),
-                      ),
-                    );
-                  },
-                ),
-              ],
-            )
-          ],
-        ),
-      ),
+      for (final d in days) ..._getEventsForDay(d),
     ];
+  }
+
+  void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
+    if (!isSameDay(_selectedDay, selectedDay)) {
+      setState(() {
+        _selectedDay = selectedDay;
+        _focusedDay = focusedDay;
+        _rangeStart = null; // Important to clean those
+        _rangeEnd = null;
+        _rangeSelectionMode = RangeSelectionMode.toggledOff;
+      });
+
+      _selectedEvents.value = _getEventsForDay(selectedDay);
+    }
+  }
+
+  void _onRangeSelected(DateTime? start, DateTime? end, DateTime focusedDay) {
+    setState(() {
+      _selectedDay = null;
+      _focusedDay = focusedDay;
+      _rangeStart = start;
+      _rangeEnd = end;
+      _rangeSelectionMode = RangeSelectionMode.toggledOn;
+    });
+
+    // `start` or `end` could be null
+    if (start != null && end != null) {
+      _selectedEvents.value = _getEventsForRange(start, end);
+    } else if (start != null) {
+      _selectedEvents.value = _getEventsForDay(start);
+    } else if (end != null) {
+      _selectedEvents.value = _getEventsForDay(end);
+    }
   }
 
   @override
@@ -109,89 +108,189 @@ class _TimeTableState extends State<TimeTable> {
           backgroundColor: Colors.green.withOpacity(0.0),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text(
-                      '2023년 1학기',
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(
-                      '시간표',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 25,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  ],
-                ),
-                IconButton(
-                    onPressed: myfunction,
-                    icon: const Icon(CupertinoIcons.add_circled),
-                    iconSize: 35,
-                    color: Colors.blue.withOpacity(1)),
-              ],
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Container(
-              key: _viewKey,
-              height: kColumnLength / 2 * kBoxSize + kColumnLength,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Stack(
-                children: [
-                  Row(children: [
-                    buildTimeColumn(),
-                    for (int i = 0; i < 5; i++) ...buildDayColumn(i),
-                  ]),
-                  Positioned(
-                    left: kFirstColumnHeight,
-                    top: 0 + kFirstColumnHeight,
-                    // top: kFirstColumnHeight + kBoxSize / 2,
-                    // height: kBoxSize + kBoxSize * 0.5,
-                    height: kBoxSize,
-                    width: _getSize(_viewKey).width,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ValueListenableBuilder<DateTime>(
+            valueListenable: ValueNotifier(_focusedDay),
+            builder: (context, value, _) {
+              return _CalendarHeader(
+                focusedDay: value,
+                clearButtonVisible: canClearSelection,
+                onTodayButtonTap: () {
+                  setState(() => _focusedDay = DateTime.now());
+                },
+                onClearButtonTap: () {
+                  setState(() {
+                    _rangeStart = null;
+                    _rangeEnd = null;
+                    _selectedDays.clear();
+                    _selectedEvents.value = [];
+                  });
+                },
+                onLeftArrowTap: () {
+                  _pageController.previousPage(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOut,
+                  );
+                },
+                onRightArrowTap: () {
+                  _pageController.nextPage(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOut,
+                  );
+                },
+              );
+            },
+          ),
+          TableCalendar<Event>(
+            locale: 'ko-kr',
+            firstDay: kFirstDay,
+            lastDay: kLastDay,
+            focusedDay: _focusedDay,
+            headerVisible: false,
+            selectedDayPredicate: (day) => _selectedDays.contains(day),
+            rangeStartDay: _rangeStart,
+            rangeEndDay: _rangeEnd,
+            calendarFormat: _calendarFormat,
+            rangeSelectionMode: _rangeSelectionMode,
+            eventLoader: _getEventsForDay,
+            holidayPredicate: (day) {
+              // Every 20th day of the month will be treated as a holiday
+              return day.day == 20;
+            },
+            onDaySelected: _onDaySelected,
+            onRangeSelected: _onRangeSelected,
+            onCalendarCreated: (controller) => _pageController = controller,
+            onPageChanged: (focusedDay) => _focusedDay = focusedDay,
+            onFormatChanged: (format) {
+              if (_calendarFormat != format) {
+                setState(() => _calendarFormat = format);
+              }
+            },
+          ),
+          const SizedBox(height: 0),
+          Expanded(
+            child: _getEventsForDay(_selectedDay!).isEmpty
+                ? Transform.translate(
+                    offset: const Offset(0, 20),
                     child: Container(
-                      color: Colors.green,
-                      child: const Text('asd'),
+                      margin: const EdgeInsets.all(7),
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        border:
+                            Border.all(color: Colors.blueAccent, width: 2.5),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(15),
+                          topRight: Radius.circular(15),
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          const SizedBox(
+                            height: 3,
+                          ),
+                          Expanded(
+                            child: Center(
+                              child: Transform.translate(
+                                offset: const Offset(0, -20),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      CupertinoIcons.check_mark_circled,
+                                      color: Colors.blue,
+                                      size: 80,
+                                    ),
+                                    const SizedBox(height: 5),
+                                    Container(
+                                      alignment: Alignment.center,
+                                      padding: const EdgeInsets.only(left: 15),
+                                      child: const Text(
+                                        '학습 할 내용이 없습니다!',
+                                        style: TextStyle(
+                                          color: Colors.blue,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 20,
+                                        ),
+                                      ), //일정 없을 시
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : Transform.translate(
+                    offset: const Offset(0, 20),
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      margin: const EdgeInsets.all(7),
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        border:
+                            Border.all(color: Colors.blueAccent, width: 2.5),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(15),
+                          topRight: Radius.circular(15),
+                        ),
+                      ),
+                      child: ValueListenableBuilder<List<Event>>(
+                        valueListenable: _selectedEvents,
+                        builder: (context, value, _) {
+                          return ListView.builder(
+                            padding: const EdgeInsets.all(0),
+                            itemCount: value.length,
+                            itemBuilder: (context, index) {
+                              return Container(
+                                padding: const EdgeInsets.all(0),
+                                margin: const EdgeInsets.symmetric(
+                                  vertical: 4.0,
+                                ),
+                                decoration: const BoxDecoration(
+                                  border:
+                                      Border(bottom: BorderSide(width: 0.3)),
+                                ),
+                                child: ListTile(
+                                  trailing: value[index].checkState
+                                      ? const Icon(
+                                          CupertinoIcons
+                                              .check_mark_circled_solid,
+                                          color: Colors.blue,
+                                        )
+                                      : const Icon(CupertinoIcons.circle),
+                                  onTap: () => {
+                                    setState(() {
+                                      value[index].checkState =
+                                          !(value[index].checkState);
+                                    })
+                                  },
+                                  title: Text(
+                                    '${value[index]}',
+                                    style: TextStyle(
+                                        color: value[index].checkState
+                                            ? Colors.grey
+                                            : Colors.black,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        decoration: value[index].checkState
+                                            ? TextDecoration.lineThrough
+                                            : TextDecoration.none),
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
                     ),
                   ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-}
-
-myfunction() {
-  print('function');
 }

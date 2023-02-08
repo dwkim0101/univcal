@@ -187,10 +187,11 @@ class _TimeTableState extends State<TimeTable> {
                       ],
                     ),
                     IconButton(
-                        onPressed: _listUpdate,
-                        icon: const Icon(CupertinoIcons.add_circled),
-                        iconSize: 35,
-                        color: Colors.blue.withOpacity(1)),
+                      onPressed: _listUpdate,
+                      icon: const Icon(CupertinoIcons.add_circled),
+                      iconSize: 35,
+                      color: Colors.blue.withOpacity(1),
+                    ),
                   ],
                 ),
                 const SizedBox(

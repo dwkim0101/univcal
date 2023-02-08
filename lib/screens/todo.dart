@@ -17,6 +17,7 @@ class StudyReminderView extends StatefulWidget {
 
 class _StudyReminderViewState extends State<StudyReminderView> {
   List<int> currentReviewDays = [60, 28, 14, 7, 3, 1];
+  int currentReviewDaysLength = 6;
   late final ValueNotifier<List<Event>> _selectedEvents;
   final DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
@@ -42,9 +43,10 @@ class _StudyReminderViewState extends State<StudyReminderView> {
   Widget _makeTodoWidget(int dayVariable) {
     dayVariable = dayVariable * -1;
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(10),
       child: Column(
         children: [
+          const SizedBox(height: 10),
           _getEventsForDay(_selectedDay!.add(Duration(days: dayVariable)))
                   .isEmpty
               ? const SizedBox(height: 0)
@@ -75,7 +77,7 @@ class _StudyReminderViewState extends State<StudyReminderView> {
                                 color: Colors.blue,
                                 size: 100,
                               ),
-                              const SizedBox(height: 5),
+                              const SizedBox(height: 15),
                               Container(
                                 alignment: Alignment.center,
                                 padding: const EdgeInsets.only(left: 15),
@@ -84,7 +86,7 @@ class _StudyReminderViewState extends State<StudyReminderView> {
                                   style: const TextStyle(
                                     color: Colors.blue,
                                     fontWeight: FontWeight.w600,
-                                    fontSize: 25,
+                                    fontSize: 20,
                                   ),
                                 ), //일정 없을 시
                               ),
@@ -187,6 +189,75 @@ class _StudyReminderViewState extends State<StudyReminderView> {
                     ),
                   ),
                 ],
+              ),
+              IconButton(
+                onPressed: () {
+                  showModalBottomSheet(
+                      context: context,
+                      builder: (context) {
+                        return StatefulBuilder(builder: (BuildContext context,
+                            StateSetter setState /*You can rename this!*/) {
+                          return Container(
+                            height: 500, // 모달 높이 크기
+                            decoration: const BoxDecoration(
+                              color: Colors.white, // 모달 배경색
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(50), // 모달 좌상단 라운딩 처리
+                                topRight: Radius.circular(50), // 모달 우상단 라운딩 처리
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                const SizedBox(height: 30),
+                                const Text(
+                                  '복습 일자 지정',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 25),
+                                ),
+                                const SizedBox(height: 30),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    IconButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          currentReviewDaysLength =
+                                              currentReviewDaysLength - 1;
+                                        });
+                                      },
+                                      icon: const Icon(
+                                          CupertinoIcons.minus_circle_fill),
+                                    ),
+                                    Container(
+                                      height: 40,
+                                      width: 40,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(),
+                                      ),
+                                      child: Text(
+                                        '$currentReviewDaysLength',
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(fontSize: 30),
+                                      ),
+                                    ),
+                                    const IconButton(
+                                      onPressed: null,
+                                      icon: Icon(
+                                          CupertinoIcons.add_circled_solid),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ); // 모달 내부 디자인 영역
+                        });
+                      });
+                },
+                icon: const Icon(CupertinoIcons.gear_alt_fill),
+                iconSize: 35,
+                color: Colors.blue.withOpacity(1),
               ),
             ],
           ),

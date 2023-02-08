@@ -25,8 +25,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       icon: Icon(CupertinoIcons.check_mark_circled),
     ),
     Tab(
-      text: '설정',
-      icon: Icon(CupertinoIcons.gear),
+      text: '정보',
+      icon: Icon(CupertinoIcons.info_circle),
     ),
   ];
 
@@ -62,7 +62,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         ),
       ),
       body: Container(
-        color: const Color(0xFFF6FE63),
+        color: Colors.red,
         child: TabBarView(
           physics: const NeverScrollableScrollPhysics(),
           controller: _tabController,
@@ -70,7 +70,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             TimeTable(),
             CalendarEvents(),
             StudyReminderView(),
-            Icon(CupertinoIcons.gear),
+            Icon(CupertinoIcons.hammer_fill),
           ],
           // myTabs.map((Tab tab) {
           //   return Center(
