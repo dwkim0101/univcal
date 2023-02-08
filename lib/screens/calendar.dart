@@ -17,7 +17,7 @@ class CalendarEvents extends StatefulWidget {
 
 class _CalendarEventsState extends State<CalendarEvents> {
   late final ValueNotifier<List<Event>> _selectedEvents;
-  CalendarFormat _calendarFormat = CalendarFormat.twoWeeks;
+  CalendarFormat _calendarFormat = CalendarFormat.month;
   RangeSelectionMode _rangeSelectionMode = RangeSelectionMode
       .toggledOff; // Can be toggled on/off by longpressing a date
   DateTime _focusedDay = DateTime.now();
@@ -118,7 +118,7 @@ class _CalendarEventsState extends State<CalendarEvents> {
             },
             weekendDays: const [DateTime.sunday],
             headerStyle: const HeaderStyle(
-              titleCentered: true,
+              titleCentered: false,
               formatButtonTextStyle:
                   TextStyle(color: Colors.white, fontSize: 13),
               formatButtonDecoration: BoxDecoration(
@@ -133,8 +133,8 @@ class _CalendarEventsState extends State<CalendarEvents> {
               markersMaxCount: 1,
               // markerDecoration: BoxDecoration(),
               markerSize: 5,
-              todayTextStyle: TextStyle(
-                  color: Colors.blueAccent, fontWeight: FontWeight.w900),
+              todayTextStyle:
+                  TextStyle(color: Colors.blue, fontWeight: FontWeight.w900),
               todayDecoration: BoxDecoration(
                   color: Colors.transparent, shape: BoxShape.circle),
               isTodayHighlighted: true,
@@ -162,14 +162,13 @@ class _CalendarEventsState extends State<CalendarEvents> {
                 ? Transform.translate(
                     offset: const Offset(0, 20),
                     child: Container(
-                      margin: const EdgeInsets.all(7),
+                      margin: const EdgeInsets.all(0),
                       decoration: BoxDecoration(
-                        color: Colors.transparent,
-                        border:
-                            Border.all(color: Colors.blueAccent, width: 2.5),
+                        color: Colors.blue,
+                        border: Border.all(color: Colors.blue, width: 2.5),
                         borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(15),
-                          topRight: Radius.circular(15),
+                          topLeft: Radius.circular(35),
+                          topRight: Radius.circular(35),
                         ),
                       ),
                       child: Column(
@@ -186,7 +185,7 @@ class _CalendarEventsState extends State<CalendarEvents> {
                                   children: [
                                     const Icon(
                                       CupertinoIcons.check_mark_circled,
-                                      color: Colors.blue,
+                                      color: Colors.white,
                                       size: 80,
                                     ),
                                     const SizedBox(height: 5),
@@ -196,7 +195,7 @@ class _CalendarEventsState extends State<CalendarEvents> {
                                       child: const Text(
                                         '학습 할 내용이 없습니다!',
                                         style: TextStyle(
-                                          color: Colors.blue,
+                                          color: Colors.white,
                                           fontWeight: FontWeight.w600,
                                           fontSize: 20,
                                         ),
@@ -215,14 +214,13 @@ class _CalendarEventsState extends State<CalendarEvents> {
                     offset: const Offset(0, 20),
                     child: Container(
                       padding: const EdgeInsets.all(10),
-                      margin: const EdgeInsets.all(7),
+                      margin: const EdgeInsets.all(0),
                       decoration: BoxDecoration(
-                        color: Colors.transparent,
-                        border:
-                            Border.all(color: Colors.blueAccent, width: 2.5),
+                        color: Colors.blue,
+                        border: Border.all(color: Colors.blue, width: 2.5),
                         borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(15),
-                          topRight: Radius.circular(15),
+                          topLeft: Radius.circular(35),
+                          topRight: Radius.circular(35),
                         ),
                       ),
                       child: ValueListenableBuilder<List<Event>>(
@@ -238,17 +236,22 @@ class _CalendarEventsState extends State<CalendarEvents> {
                                   vertical: 4.0,
                                 ),
                                 decoration: const BoxDecoration(
-                                  border:
-                                      Border(bottom: BorderSide(width: 0.3)),
+                                  border: Border(
+                                      bottom: BorderSide(
+                                          width: 1.5, color: Colors.white)),
                                 ),
                                 child: ListTile(
+                                  selectedTileColor: Colors.blueAccent,
                                   trailing: value[index].checkState
                                       ? const Icon(
                                           CupertinoIcons
                                               .check_mark_circled_solid,
-                                          color: Colors.blue,
+                                          color: Colors.white,
                                         )
-                                      : const Icon(CupertinoIcons.circle),
+                                      : const Icon(
+                                          CupertinoIcons.circle,
+                                          color: Colors.white,
+                                        ),
                                   onTap: () => {
                                     setState(() {
                                       value[index].checkState =
@@ -258,14 +261,19 @@ class _CalendarEventsState extends State<CalendarEvents> {
                                   title: Text(
                                     '${value[index]}',
                                     style: TextStyle(
-                                        color: value[index].checkState
-                                            ? Colors.grey
-                                            : Colors.black,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                        decoration: value[index].checkState
-                                            ? TextDecoration.lineThrough
-                                            : TextDecoration.none),
+                                      color: value[index].checkState
+                                          ? Colors.white.withOpacity(0.6)
+                                          : Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: value[index].checkState
+                                          ? FontWeight.w700
+                                          : FontWeight.w700,
+                                      decoration: value[index].checkState
+                                          ? TextDecoration.lineThrough
+                                          : TextDecoration.none,
+                                      decorationColor: Colors.white,
+                                      decorationThickness: 2,
+                                    ),
                                   ),
                                 ),
                               );
@@ -280,22 +288,26 @@ class _CalendarEventsState extends State<CalendarEvents> {
       ),
       floatingActionButton: Stack(
         children: <Widget>[
+          // Align(
+          //   alignment: Alignment.bottomRight,
+          //   child: FloatingActionButton(
+          //     onPressed: () {
+          //       setState(() => _onDaySelected(DateTime.now(), DateTime.now()));
+          //     },
+          //     tooltip: 'TODAY',
+          //     child: const Icon(CupertinoIcons.refresh),
+          //   ),
+          // ),
           Align(
-            alignment: Alignment(
-                Alignment.bottomRight.x, Alignment.bottomRight.y - 0.2),
-            child: FloatingActionButton(
-              onPressed: () {
-                setState(() => _onDaySelected(DateTime.now(), DateTime.now()));
-              },
-              tooltip: 'TODAY',
-              child: const Icon(CupertinoIcons.refresh),
-            ),
-          ),
-          const Align(
             alignment: Alignment.bottomRight,
             child: FloatingActionButton(
-              onPressed: null,
-              child: Icon(CupertinoIcons.add),
+              backgroundColor: Colors.white,
+              onPressed: () => print('asd'), //TODO: 일정추가/삭제 등등 구현
+              child: const Icon(
+                CupertinoIcons.add,
+                color: Colors.blue,
+                size: 25,
+              ),
             ),
           ),
         ],

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:univcal/screens/calendar.dart';
+import 'package:univcal/screens/info.dart';
 import 'package:univcal/screens/timetable.dart';
 import 'package:univcal/screens/todo.dart';
 
@@ -62,7 +63,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         ),
       ),
       body: Container(
-        color: Colors.red,
+        color: Colors.transparent,
         child: TabBarView(
           physics: const NeverScrollableScrollPhysics(),
           controller: _tabController,
@@ -70,7 +71,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             TimeTable(),
             CalendarEvents(),
             StudyReminderView(),
-            Icon(CupertinoIcons.hammer_fill),
+            InfoPage(),
           ],
           // myTabs.map((Tab tab) {
           //   return Center(
