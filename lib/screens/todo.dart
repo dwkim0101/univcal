@@ -16,6 +16,7 @@ class StudyReminderView extends StatefulWidget {
 }
 
 class _StudyReminderViewState extends State<StudyReminderView> {
+  List<int> currentReviewDays = [60, 28, 14, 7, 3, 1];
   late final ValueNotifier<List<Event>> _selectedEvents;
   final DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
@@ -36,6 +37,114 @@ class _StudyReminderViewState extends State<StudyReminderView> {
 
   List<Event> _getEventsForDay(DateTime day) {
     return kEvents[day] ?? [];
+  }
+
+  Widget _makeTodoWidget(int dayVariable) {
+    dayVariable = dayVariable * -1;
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: [
+          _getEventsForDay(_selectedDay!.add(Duration(days: dayVariable)))
+                  .isEmpty
+              ? const SizedBox(height: 0)
+              : Container(
+                  alignment: Alignment.topLeft,
+                  padding: const EdgeInsets.only(left: 15),
+                  child: Text(
+                    '${dayVariable * -1}일전 학습내용',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+          Expanded(
+            child: _getEventsForDay(
+                        _selectedDay!.add(Duration(days: dayVariable)))
+                    .isEmpty
+                ? Column(
+                    children: [
+                      const SizedBox(
+                        height: 3,
+                      ),
+                      Expanded(
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                CupertinoIcons.check_mark_circled,
+                                color: Colors.blue,
+                                size: 100,
+                              ),
+                              const SizedBox(height: 5),
+                              Container(
+                                alignment: Alignment.center,
+                                padding: const EdgeInsets.only(left: 15),
+                                child: Text(
+                                  '${dayVariable * -1}일전 학습 내용이 없습니다!',
+                                  style: const TextStyle(
+                                    color: Colors.blue,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 25,
+                                  ),
+                                ), //일정 없을 시
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : ValueListenableBuilder<List<Event>>(
+                    valueListenable: ValueNotifier(_getEventsForDay(
+                        _selectedDay!.add(Duration(days: dayVariable)))),
+                    builder: (context, value, _) {
+                      return ListView.builder(
+                        padding: const EdgeInsets.all(0),
+                        itemCount: value.length,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            padding: const EdgeInsets.all(0),
+                            margin: const EdgeInsets.symmetric(
+                              vertical: 4.0,
+                            ),
+                            decoration: const BoxDecoration(
+                              border: Border(bottom: BorderSide(width: 0.3)),
+                            ),
+                            child: ListTile(
+                              trailing: value[index].checkState
+                                  ? const Icon(
+                                      CupertinoIcons.check_mark_circled_solid,
+                                      color: Colors.blue,
+                                    )
+                                  : const Icon(CupertinoIcons.circle),
+                              onTap: () => {
+                                setState(() {
+                                  value[index].checkState =
+                                      !(value[index].checkState);
+                                })
+                              },
+                              title: Text(
+                                '${value[index]}',
+                                style: TextStyle(
+                                    color: value[index].checkState
+                                        ? Colors.grey
+                                        : Colors.black,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    decoration: value[index].checkState
+                                        ? TextDecoration.lineThrough
+                                        : TextDecoration.none),
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -79,11 +188,6 @@ class _StudyReminderViewState extends State<StudyReminderView> {
                   ),
                 ],
               ),
-              IconButton(
-                  onPressed: null,
-                  icon: const Icon(CupertinoIcons.add_circled),
-                  iconSize: 35,
-                  color: Colors.blue.withOpacity(1)),
             ],
           ),
         ),
@@ -96,119 +200,30 @@ class _StudyReminderViewState extends State<StudyReminderView> {
                   color: Colors.blue,
                   constraints: const BoxConstraints.expand(height: 50),
                   child: TabBar(
-                      dividerColor: Colors.black,
+                      dividerColor: Colors.white,
+                      unselectedLabelStyle: const TextStyle(
+                        fontWeight: FontWeight.normal,
+                      ),
                       labelStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
                         fontSize: 10,
                       ),
                       tabs: [
-                        Tab(
-                          text: DateFormat("MM월\ndd일").format(
-                              DateTime.now().add(const Duration(days: -60))),
-                        ),
-                        Tab(
-                          text: DateFormat("MM월\ndd일").format(
-                              DateTime.now().add(const Duration(days: -28))),
-                        ),
-                        Tab(
-                          text: DateFormat("MM월\ndd일").format(
-                              DateTime.now().add(const Duration(days: -14))),
-                        ),
-                        Tab(
-                          text: DateFormat("MM월\ndd일").format(
-                              DateTime.now().add(const Duration(days: -7))),
-                        ),
-                        Tab(
-                          text: DateFormat("MM월\ndd일").format(
-                              DateTime.now().add(const Duration(days: -3))),
-                        ),
-                        Tab(
-                          text: DateFormat("MM월\ndd일").format(
-                              DateTime.now().add(const Duration(days: -1))),
-                        ),
+                        ...List<Tab>.generate(currentReviewDays.length,
+                            (index) {
+                          return Tab(
+                            text: DateFormat("MM월\ndd일").format(DateTime.now()
+                                .add(Duration(
+                                    days: currentReviewDays[index] * -1))),
+                          );
+                        })
                       ]),
                 ),
                 const SizedBox(height: 10),
                 Expanded(
                   child: TabBarView(children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        children: [
-                          Container(
-                              alignment: Alignment.topLeft,
-                              child: const Text(
-                                '60일전 학습내용',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              )),
-                          Expanded(
-                            child: _getEventsForDay(_selectedDay!
-                                        .add(const Duration(days: 0)))
-                                    .isEmpty
-                                ? Container(
-                                    alignment: Alignment.topLeft,
-                                    child:
-                                        const Text('복습할 내용이 없습니다.'), //일정 없을 시
-                                  )
-                                : ValueListenableBuilder<List<Event>>(
-                                    valueListenable: ValueNotifier(
-                                        _getEventsForDay(_selectedDay!
-                                            .add(const Duration(days: 0)))),
-                                    builder: (context, value, _) {
-                                      return ListView.builder(
-                                        padding: const EdgeInsets.all(0),
-                                        itemCount: value.length,
-                                        itemBuilder: (context, index) {
-                                          return value.isEmpty
-                                              ? const Text('asd')
-                                              : Container(
-                                                  padding:
-                                                      const EdgeInsets.all(0),
-                                                  margin: const EdgeInsets
-                                                      .symmetric(
-                                                    vertical: 4.0,
-                                                  ),
-                                                  decoration:
-                                                      const BoxDecoration(
-                                                    border: Border(
-                                                        bottom: BorderSide()),
-                                                  ),
-                                                  child: ListTile(
-                                                    trailing: const Icon(
-                                                        CupertinoIcons.circle),
-                                                    onTap: () => print(
-                                                        '${value[index]}'),
-                                                    title: Text(
-                                                      '${value[index]}',
-                                                      style: const TextStyle(
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                  ),
-                                                );
-                                        },
-                                      );
-                                    },
-                                  ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      child: const Text("Articles Body"),
-                    ),
-                    Container(
-                      child: const Text("User Body"),
-                    ),
-                    Container(
-                      child: const Text("User Body"),
-                    ),
-                    Container(
-                      child: const Text("User Body"),
-                    ),
-                    Container(
-                      child: const Text("User Body"),
-                    ),
+                    ...List<Widget>.generate(currentReviewDays.length,
+                        (index) => _makeTodoWidget(currentReviewDays[index])),
                   ]),
                 )
               ],
