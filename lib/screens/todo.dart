@@ -17,7 +17,6 @@ class StudyReminderView extends StatefulWidget {
 
 class _StudyReminderViewState extends State<StudyReminderView> {
   List<int> currentReviewDays = [60, 28, 14, 7, 3, 1];
-  int currentReviewDaysLength = 6;
   late final ValueNotifier<List<Event>> _selectedEvents;
   final DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
@@ -82,7 +81,7 @@ class _StudyReminderViewState extends State<StudyReminderView> {
                                 alignment: Alignment.center,
                                 padding: const EdgeInsets.only(left: 15),
                                 child: Text(
-                                  '${dayVariable * -1}일전 학습 내용이 없습니다!',
+                                  '${dayVariable * -1} 일전 학습 내용이 없습니다!',
                                   style: const TextStyle(
                                     color: Colors.blue,
                                     fontWeight: FontWeight.w600,
@@ -192,13 +191,18 @@ class _StudyReminderViewState extends State<StudyReminderView> {
               ),
               IconButton(
                 onPressed: () {
+                  int currentReviewDaysLength = currentReviewDays.length;
                   showModalBottomSheet(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(40.0),
+                      ),
                       context: context,
+                      isScrollControlled: true,
                       builder: (context) {
-                        return StatefulBuilder(builder: (BuildContext context,
-                            StateSetter setState /*You can rename this!*/) {
+                        return StatefulBuilder(builder:
+                            (BuildContext context, StateSetter setState) {
                           return Container(
-                            height: 500, // 모달 높이 크기
+                            height: 300, // 모달 높이 크기
                             decoration: const BoxDecoration(
                               color: Colors.white, // 모달 배경색
                               borderRadius: BorderRadius.only(
@@ -215,17 +219,25 @@ class _StudyReminderViewState extends State<StudyReminderView> {
                                       fontWeight: FontWeight.bold,
                                       fontSize: 25),
                                 ),
-                                const SizedBox(height: 30),
+                                const SizedBox(height: 4),
+                                const Text(
+                                  '복습 일자를 지정해주세요. 복습은 1 ~ 6 회를 지원합니다.',
+                                  style: TextStyle(fontSize: 12),
+                                ),
+                                const SizedBox(height: 2),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     IconButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          currentReviewDaysLength =
-                                              currentReviewDaysLength - 1;
-                                        });
-                                      },
+                                      color: Colors.blue,
+                                      onPressed: currentReviewDaysLength >= 2
+                                          ? () {
+                                              setState(() {
+                                                currentReviewDaysLength =
+                                                    currentReviewDaysLength - 1;
+                                              });
+                                            }
+                                          : null,
                                       icon: const Icon(
                                           CupertinoIcons.minus_circle_fill),
                                     ),
@@ -233,19 +245,79 @@ class _StudyReminderViewState extends State<StudyReminderView> {
                                       height: 40,
                                       width: 40,
                                       decoration: BoxDecoration(
+                                        color: Colors.white,
                                         shape: BoxShape.circle,
-                                        border: Border.all(),
+                                        border: Border.all(color: Colors.white),
                                       ),
                                       child: Text(
                                         '$currentReviewDaysLength',
                                         textAlign: TextAlign.center,
-                                        style: const TextStyle(fontSize: 30),
+                                        style: const TextStyle(
+                                            fontSize: 30, color: Colors.blue),
                                       ),
                                     ),
-                                    const IconButton(
-                                      onPressed: null,
-                                      icon: Icon(
+                                    IconButton(
+                                      color: Colors.blue,
+                                      onPressed: currentReviewDaysLength <= 5
+                                          ? () {
+                                              setState(() {
+                                                currentReviewDaysLength =
+                                                    currentReviewDaysLength + 1;
+                                              });
+                                            }
+                                          : null,
+                                      icon: const Icon(
                                           CupertinoIcons.add_circled_solid),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        ...List<Widget>.generate(
+                                          currentReviewDaysLength,
+                                          (index) {
+                                            return Column(
+                                              children: [
+                                                //TODO: 모달 텍스트 필드 해결하기
+                                                // Container(
+                                                //   width: 50,
+                                                //   height: 50,
+                                                //   decoration: BoxDecoration(
+                                                //     border: Border.all(),
+                                                //     borderRadius:
+                                                //         BorderRadius.circular(
+                                                //             5),
+                                                //   ),
+                                                // ),
+                                                const SizedBox(
+                                                  height: 5,
+                                                ),
+                                                Text(
+                                                  '${index + 1}회차',
+                                                  style: const TextStyle(
+                                                      fontSize: 12),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    ElevatedButton(
+                                      child: const Text('저장'),
+                                      onPressed: () => super.setState(() {
+                                        Navigator.pop(context);
+                                      }),
                                     ),
                                   ],
                                 ),
