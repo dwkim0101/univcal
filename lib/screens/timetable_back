@@ -1,296 +1,206 @@
-// Copyright 2019 Aleksander Woźniak
-// SPDX-License-Identifier: Apache-2.0
-
-import 'dart:collection';
-import 'package:intl/intl.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:table_calendar/table_calendar.dart';
 
-import '../utils.dart';
-
-class CalendarEvents extends StatefulWidget {
-  const CalendarEvents({super.key});
+class TimeTable extends StatefulWidget {
+  const TimeTable({super.key});
 
   @override
-  State<CalendarEvents> createState() => _CalendarEventsState();
+  State<TimeTable> createState() => _TimeTableState();
 }
 
-class _CalendarEventsState extends State<CalendarEvents> {
-  late final ValueNotifier<List<Event>> _selectedEvents;
-  CalendarFormat _calendarFormat = CalendarFormat.twoWeeks;
-  final Set<DateTime> _selectedDays = LinkedHashSet<DateTime>(
-    equals: isSameDay,
-    hashCode: getHashCode,
-  );
-
-  bool get canClearSelection =>
-      _selectedDays.isNotEmpty || _rangeStart != null || _rangeEnd != null;
-  late PageController _pageController;
-  // final ValueNotifier<DateTime> _focusedDay = ValueNotifier(DateTime.now());
-  RangeSelectionMode _rangeSelectionMode = RangeSelectionMode
-      .toggledOff; // Can be toggled on/off by longpressing a date
-  DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay;
-  DateTime? _rangeStart;
-  DateTime? _rangeEnd;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _selectedDay = _focusedDay;
-    _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
+class _TimeTableState extends State<TimeTable> {
+  static int defaultTimeValue = 2 * 7; //30분 단위
+  static int startTimeValue = 9; // Starts at 9 o'clock
+  final List<String> dateNameList = ['월', '화', '수', '목', '금'];
+  // ignore: prefer_final_fields
+  List<List<bool>> _timetableEventList = List.generate(
+      5, (index) => List.filled(defaultTimeValue, false, growable: true),
+      growable: false);
+  //0 - 월요일 => 4 - 금요일
+  _listUpdate() {
+    //TODO: make LIST UPDATE
+    _timetableEventList[1][2] = true;
+    _timetableEventList[1][1] = true;
+    // print(_timetableEventList);
   }
 
-  @override
-  void dispose() {
-    _selectedEvents.dispose();
-    super.dispose();
+  Border _eventBlockBorderConstructor(int dateIndex, int timeIndex) {
+    return const Border(right: BorderSide(width: 1));
+    // return Border(bottom: ,top: ,);
   }
 
-  List<Event> _getEventsForDay(DateTime day) {
-    // Implementation example
-    return kEvents[day] ?? [];
+  _makeTableContainer() {
+    _listUpdate();
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.grey,
+        ),
+        // borderRadius: const BorderRadius.all(Radius.circular(5))
+      ),
+      child: _makeInnerTable(),
+    );
   }
 
-  List<Event> _getEventsForRange(DateTime start, DateTime end) {
-    // Implementation example
-    final days = daysInRange(start, end);
-
-    return [
-      for (final d in days) ..._getEventsForDay(d),
-    ];
-  }
-
-  void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
-    if (!isSameDay(_selectedDay, selectedDay)) {
-      setState(() {
-        _selectedDay = selectedDay;
-        _focusedDay = focusedDay;
-        _rangeStart = null; // Important to clean those
-        _rangeEnd = null;
-        _rangeSelectionMode = RangeSelectionMode.toggledOff;
-      });
-
-      _selectedEvents.value = _getEventsForDay(selectedDay);
+  _makeInnerTable() {
+    // _timetableEventList[1].add(true);
+    int size = 7;
+    for (int i = 0; i < _timetableEventList.length; i++) {
+      if (size < _timetableEventList[i].length) {
+        size = _timetableEventList[i].length;
+      }
+      print(_timetableEventList[i].length);
     }
-  }
+    print(size);
+    const double firstBoxSize = 20.0;
+    const double defaultBoxSize = 50.0;
 
-  void _onRangeSelected(DateTime? start, DateTime? end, DateTime focusedDay) {
-    setState(() {
-      _selectedDay = null;
-      _focusedDay = focusedDay;
-      _rangeStart = start;
-      _rangeEnd = end;
-      _rangeSelectionMode = RangeSelectionMode.toggledOn;
-    });
-
-    // `start` or `end` could be null
-    if (start != null && end != null) {
-      _selectedEvents.value = _getEventsForRange(start, end);
-    } else if (start != null) {
-      _selectedEvents.value = _getEventsForDay(start);
-    } else if (end != null) {
-      _selectedEvents.value = _getEventsForDay(end);
-    }
+    return Row(
+      children: [
+        Column(
+          children: [
+            const SizedBox(
+              //first Container
+              width: firstBoxSize,
+              height: firstBoxSize,
+              // decoration: BoxDecoration(
+              //   border: Border.all(
+              //     width: 0.5,
+              //     color: Colors.green,
+              //   ),
+              // ),
+            ),
+            ...List<Widget>.generate(size ~/ 2, (idx) {
+              return Container(
+                alignment: Alignment.topRight,
+                height: defaultBoxSize,
+                width: firstBoxSize,
+                decoration: const BoxDecoration(
+                  border: Border(
+                    top: BorderSide(width: 0.5),
+                    bottom: BorderSide(width: 0.5),
+                    left: BorderSide(width: 0.5),
+                    right: BorderSide(width: 1),
+                  ),
+                ),
+                child: Text(
+                  (idx + startTimeValue > 12
+                          ? idx + startTimeValue - 12
+                          : idx + startTimeValue)
+                      .toString(),
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              );
+            }, growable: true)
+                .toList(),
+          ],
+        ),
+        ...List<Widget>.generate(5, (dateIndex) {
+          return Expanded(
+            flex: 1,
+            child: Column(
+              children: [
+                Container(
+                  alignment: Alignment.center,
+                  width: double.infinity,
+                  height: firstBoxSize,
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      top: BorderSide(width: 0.5),
+                      bottom: BorderSide(width: 1),
+                      left: BorderSide(width: 0.5),
+                      right: BorderSide(width: 0.5),
+                    ),
+                  ),
+                  child: Text(
+                    dateNameList[dateIndex].toString(),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                ...List<Widget>.generate(size, (timeIndex) {
+                  return Container(
+                    height: defaultBoxSize / 2,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: _timetableEventList[dateIndex][timeIndex]
+                          ? Colors.blue
+                          : Colors.transparent,
+                      border:
+                          _eventBlockBorderConstructor(dateIndex, timeIndex),
+                    ),
+                  );
+                }),
+              ],
+            ),
+          );
+        }),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.zero,
-        child: AppBar(
-          elevation: 0,
-          systemOverlayStyle: SystemUiOverlayStyle.dark,
-          backgroundColor: Colors.green.withOpacity(0.0),
+        appBar: PreferredSize(
+          preferredSize: Size.zero,
+          child: AppBar(
+            elevation: 0,
+            systemOverlayStyle: SystemUiOverlayStyle.dark,
+            backgroundColor: Colors.green.withOpacity(0.0),
+          ),
         ),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ValueListenableBuilder<DateTime>(
-            valueListenable: ValueNotifier(_focusedDay),
-            builder: (context, value, _) {
-              return _CalendarHeader(
-                focusedDay: value,
-                clearButtonVisible: canClearSelection,
-                onTodayButtonTap: () {
-                  setState(() => _focusedDay = DateTime.now());
-                },
-                onClearButtonTap: () {
-                  setState(() {
-                    _rangeStart = null;
-                    _rangeEnd = null;
-                    _selectedDays.clear();
-                    _selectedEvents.value = [];
-                  });
-                },
-                onLeftArrowTap: () {
-                  _pageController.previousPage(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeOut,
-                  );
-                },
-                onRightArrowTap: () {
-                  _pageController.nextPage(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeOut,
-                  );
-                },
-              );
-            },
-          ),
-          TableCalendar<Event>(
-            locale: 'ko-kr',
-            firstDay: kFirstDay,
-            lastDay: kLastDay,
-            focusedDay: _focusedDay,
-            headerVisible: false,
-            selectedDayPredicate: (day) => _selectedDays.contains(day),
-            rangeStartDay: _rangeStart,
-            rangeEndDay: _rangeEnd,
-            calendarFormat: _calendarFormat,
-            rangeSelectionMode: _rangeSelectionMode,
-            eventLoader: _getEventsForDay,
-            holidayPredicate: (day) {
-              // Every 20th day of the month will be treated as a holiday
-              return day.day == 20;
-            },
-            onDaySelected: _onDaySelected,
-            onRangeSelected: _onRangeSelected,
-            onCalendarCreated: (controller) => _pageController = controller,
-            onPageChanged: (focusedDay) => _focusedDay = focusedDay,
-            onFormatChanged: (format) {
-              if (_calendarFormat != format) {
-                setState(() => _calendarFormat = format);
-              }
-            },
-          ),
-          const SizedBox(height: 0),
-          Expanded(
-            child: _getEventsForDay(_selectedDay!).isEmpty
-                ? Transform.translate(
-                    offset: const Offset(0, 20),
-                    child: Container(
-                      margin: const EdgeInsets.all(7),
-                      decoration: BoxDecoration(
-                        color: Colors.transparent,
-                        border:
-                            Border.all(color: Colors.blueAccent, width: 2.5),
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(15),
-                          topRight: Radius.circular(15),
-                        ),
-                      ),
-                      child: Column(
-                        children: [
-                          const SizedBox(
-                            height: 3,
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Text(
+                          '2023년 1학기', //TODO: 이름 어떻게 컨트롤할지 생각
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
                           ),
-                          Expanded(
-                            child: Center(
-                              child: Transform.translate(
-                                offset: const Offset(0, -20),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Icon(
-                                      CupertinoIcons.check_mark_circled,
-                                      color: Colors.blue,
-                                      size: 80,
-                                    ),
-                                    const SizedBox(height: 5),
-                                    Container(
-                                      alignment: Alignment.center,
-                                      padding: const EdgeInsets.only(left: 15),
-                                      child: const Text(
-                                        '학습 할 내용이 없습니다!',
-                                        style: TextStyle(
-                                          color: Colors.blue,
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 20,
-                                        ),
-                                      ), //일정 없을 시
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                : Transform.translate(
-                    offset: const Offset(0, 20),
-                    child: Container(
-                      padding: const EdgeInsets.all(10),
-                      margin: const EdgeInsets.all(7),
-                      decoration: BoxDecoration(
-                        color: Colors.transparent,
-                        border:
-                            Border.all(color: Colors.blueAccent, width: 2.5),
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(15),
-                          topRight: Radius.circular(15),
                         ),
-                      ),
-                      child: ValueListenableBuilder<List<Event>>(
-                        valueListenable: _selectedEvents,
-                        builder: (context, value, _) {
-                          return ListView.builder(
-                            padding: const EdgeInsets.all(0),
-                            itemCount: value.length,
-                            itemBuilder: (context, index) {
-                              return Container(
-                                padding: const EdgeInsets.all(0),
-                                margin: const EdgeInsets.symmetric(
-                                  vertical: 4.0,
-                                ),
-                                decoration: const BoxDecoration(
-                                  border:
-                                      Border(bottom: BorderSide(width: 0.3)),
-                                ),
-                                child: ListTile(
-                                  trailing: value[index].checkState
-                                      ? const Icon(
-                                          CupertinoIcons
-                                              .check_mark_circled_solid,
-                                          color: Colors.blue,
-                                        )
-                                      : const Icon(CupertinoIcons.circle),
-                                  onTap: () => {
-                                    setState(() {
-                                      value[index].checkState =
-                                          !(value[index].checkState);
-                                    })
-                                  },
-                                  title: Text(
-                                    '${value[index]}',
-                                    style: TextStyle(
-                                        color: value[index].checkState
-                                            ? Colors.grey
-                                            : Colors.black,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                        decoration: value[index].checkState
-                                            ? TextDecoration.lineThrough
-                                            : TextDecoration.none),
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
+                        Text(
+                          '시간표',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 25,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
+                    IconButton(
+                      onPressed: _listUpdate,
+                      icon: const Icon(CupertinoIcons.add_circled),
+                      iconSize: 35,
+                      color: Colors.blue.withOpacity(1),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                _makeTableContainer(),
+              ],
+            ),
           ),
-        ],
-      ),
-    );
+        ));
   }
 }

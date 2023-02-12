@@ -36,113 +36,11 @@ class _TimeTableState extends State<TimeTable> {
       width: double.infinity,
       decoration: BoxDecoration(
         border: Border.all(
-          color: Colors.grey,
+          color: Colors.blue,
         ),
         // borderRadius: const BorderRadius.all(Radius.circular(5))
       ),
-      child: _makeInnerTable(),
-    );
-  }
-
-  _makeInnerTable() {
-    // _timetableEventList[1].add(true);
-    int size = 7;
-    for (int i = 0; i < _timetableEventList.length; i++) {
-      if (size < _timetableEventList[i].length) {
-        size = _timetableEventList[i].length;
-      }
-      print(_timetableEventList[i].length);
-    }
-    print(size);
-    const double firstBoxSize = 20.0;
-    const double defaultBoxSize = 50.0;
-
-    return Row(
-      children: [
-        Column(
-          children: [
-            const SizedBox(
-              //first Container
-              width: firstBoxSize,
-              height: firstBoxSize,
-              // decoration: BoxDecoration(
-              //   border: Border.all(
-              //     width: 0.5,
-              //     color: Colors.green,
-              //   ),
-              // ),
-            ),
-            ...List<Widget>.generate(size ~/ 2, (idx) {
-              return Container(
-                alignment: Alignment.topRight,
-                height: defaultBoxSize,
-                width: firstBoxSize,
-                decoration: const BoxDecoration(
-                  border: Border(
-                    top: BorderSide(width: 0.5),
-                    bottom: BorderSide(width: 0.5),
-                    left: BorderSide(width: 0.5),
-                    right: BorderSide(width: 1),
-                  ),
-                ),
-                child: Text(
-                  (idx + startTimeValue > 12
-                          ? idx + startTimeValue - 12
-                          : idx + startTimeValue)
-                      .toString(),
-                  style: const TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              );
-            }, growable: true)
-                .toList(),
-          ],
-        ),
-        ...List<Widget>.generate(5, (dateIndex) {
-          return Expanded(
-            flex: 1,
-            child: Column(
-              children: [
-                Container(
-                  alignment: Alignment.center,
-                  width: double.infinity,
-                  height: firstBoxSize,
-                  decoration: const BoxDecoration(
-                    border: Border(
-                      top: BorderSide(width: 0.5),
-                      bottom: BorderSide(width: 1),
-                      left: BorderSide(width: 0.5),
-                      right: BorderSide(width: 0.5),
-                    ),
-                  ),
-                  child: Text(
-                    dateNameList[dateIndex].toString(),
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                ...List<Widget>.generate(size, (timeIndex) {
-                  return Container(
-                    height: defaultBoxSize / 2,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: _timetableEventList[dateIndex][timeIndex]
-                          ? Colors.blue
-                          : Colors.transparent,
-                      border:
-                          _eventBlockBorderConstructor(dateIndex, timeIndex),
-                    ),
-                  );
-                }),
-              ],
-            ),
-          );
-        }),
-      ],
+      // child: _makeInnerTable(),
     );
   }
 
@@ -169,7 +67,7 @@ class _TimeTableState extends State<TimeTable> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: const [
                         Text(
-                          '2023년 1학기',
+                          '반복 학습', //TODO: 이름 어떻게 컨트롤할지 생각
                           style: TextStyle(
                             color: Colors.blue,
                             fontSize: 15,
@@ -177,7 +75,7 @@ class _TimeTableState extends State<TimeTable> {
                           ),
                         ),
                         Text(
-                          '시간표',
+                          '강의 목록',
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 25,
@@ -198,6 +96,10 @@ class _TimeTableState extends State<TimeTable> {
                   height: 10,
                 ),
                 _makeTableContainer(),
+                const SizedBox(
+                  height: 10,
+                ),
+                Column()
               ],
             ),
           ),
