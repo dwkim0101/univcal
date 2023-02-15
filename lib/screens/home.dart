@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:univcal/screens/calendar.dart';
+import 'package:univcal/screens/cardTest.dart';
 import 'package:univcal/screens/info.dart';
-import 'package:univcal/screens/timetable.dart';
 import 'package:univcal/screens/todo.dart';
 
 class Home extends StatefulWidget {
@@ -68,7 +68,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           physics: const NeverScrollableScrollPhysics(),
           controller: _tabController,
           children: const [
-            TimeTable(),
+            MyWidget(),
             CalendarEvents(),
             StudyReminderView(),
             InfoPage(),
@@ -119,7 +119,7 @@ class _AnimatedTabBar extends State<AnimatedTabBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.transparent,
+      color: Colors.white,
       height: tabHeight,
       child: Stack(
         children: [

@@ -55,53 +55,50 @@ class _TimeTableState extends State<TimeTable> {
             backgroundColor: Colors.green.withOpacity(0.0),
           ),
         ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          '반복 학습', //TODO: 이름 어떻게 컨트롤할지 생각
-                          style: TextStyle(
-                            color: Colors.blue,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                          ),
+        body: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text(
+                        '반복 학습', //TODO: 이름 어떻게 컨트롤할지 생각
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
                         ),
-                        Text(
-                          '강의 목록',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 25,
-                            fontWeight: FontWeight.w900,
-                          ),
+                      ),
+                      Text(
+                        '강의 목록',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 25,
+                          fontWeight: FontWeight.w900,
                         ),
-                      ],
-                    ),
-                    IconButton(
-                      onPressed: _listUpdate,
-                      icon: const Icon(CupertinoIcons.add_circled),
-                      iconSize: 35,
-                      color: Colors.blue.withOpacity(1),
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                _makeTableContainer(),
-                const SizedBox(
-                  height: 10,
-                ),
-                Column()
-              ],
-            ),
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    onPressed: _listUpdate,
+                    icon: const Icon(CupertinoIcons.add_circled),
+                    iconSize: 35,
+                    color: Colors.blue.withOpacity(1),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              _makeTableContainer(),
+              const SizedBox(
+                height: 10,
+              ),
+            ],
           ),
         ));
   }

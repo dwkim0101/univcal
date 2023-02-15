@@ -16,6 +16,7 @@ class CalendarEvents extends StatefulWidget {
 }
 
 class _CalendarEventsState extends State<CalendarEvents> {
+  double _opacity = 0;
   late final ValueNotifier<List<Event>> _selectedEvents;
   CalendarFormat _calendarFormat = CalendarFormat.month;
   RangeSelectionMode _rangeSelectionMode = RangeSelectionMode
@@ -62,7 +63,13 @@ class _CalendarEventsState extends State<CalendarEvents> {
         _rangeEnd = null;
         _rangeSelectionMode = RangeSelectionMode.toggledOff;
       });
-
+      if (isSameDay(_focusedDay, DateTime.now())) {
+        setState(() {
+          _opacity = 0;
+        });
+      } else {
+        _opacity = 1;
+      }
       _selectedEvents.value = _getEventsForDay(selectedDay);
     }
   }
@@ -97,220 +104,215 @@ class _CalendarEventsState extends State<CalendarEvents> {
           backgroundColor: Colors.green.withOpacity(0.0),
         ),
       ),
-      body: Column(
-        children: [
-          TableCalendar<Event>(
-            locale: 'ko-kr',
-            firstDay: kFirstDay,
-            lastDay: kLastDay,
-            focusedDay: _focusedDay,
-            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-            rangeStartDay: _rangeStart,
-            rangeEndDay: _rangeEnd,
-            calendarFormat: _calendarFormat,
-            rangeSelectionMode: _rangeSelectionMode,
-            eventLoader: _getEventsForDay,
-            startingDayOfWeek: StartingDayOfWeek.sunday,
-            availableCalendarFormats: const {
-              CalendarFormat.month: '월별 보기',
-              CalendarFormat.twoWeeks: '2주 보기',
-              CalendarFormat.week: '주별 보기',
-            },
-            weekendDays: const [DateTime.sunday],
-            headerStyle: const HeaderStyle(
-              titleCentered: false,
-              formatButtonTextStyle:
-                  TextStyle(color: Colors.white, fontSize: 13),
-              formatButtonDecoration: BoxDecoration(
-                  color: Colors.blue,
-                  border: Border.fromBorderSide(
-                      BorderSide(color: Colors.blue, width: 2)),
-                  borderRadius: BorderRadius.all(Radius.circular(12.0))),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: Column(
+          children: [
+            TableCalendar<Event>(
+              locale: 'ko-kr',
+              firstDay: kFirstDay,
+              lastDay: kLastDay,
+              focusedDay: _focusedDay,
+              selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+              rangeStartDay: _rangeStart,
+              rangeEndDay: _rangeEnd,
+              calendarFormat: _calendarFormat,
+              rangeSelectionMode: _rangeSelectionMode,
+              eventLoader: _getEventsForDay,
+              startingDayOfWeek: StartingDayOfWeek.sunday,
+              availableCalendarFormats: const {
+                CalendarFormat.month: '월별 보기',
+                CalendarFormat.twoWeeks: '2주 보기',
+                CalendarFormat.week: '주별 보기',
+              },
+              weekendDays: const [DateTime.sunday],
+              headerStyle: const HeaderStyle(
+                titleCentered: false,
+                formatButtonTextStyle:
+                    TextStyle(color: Colors.white, fontSize: 13),
+                formatButtonDecoration: BoxDecoration(
+                    color: Colors.blue,
+                    border: Border.fromBorderSide(
+                        BorderSide(color: Colors.blue, width: 2)),
+                    borderRadius: BorderRadius.all(Radius.circular(12.0))),
+              ),
+              calendarStyle: const CalendarStyle(
+                selectedDecoration:
+                    BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
+                markersMaxCount: 1,
+                // markerDecoration: BoxDecoration(),
+                markerSize: 5,
+                todayTextStyle:
+                    TextStyle(color: Colors.blue, fontWeight: FontWeight.w900),
+                todayDecoration: BoxDecoration(
+                    color: Colors.transparent, shape: BoxShape.circle),
+                isTodayHighlighted: true,
+                weekendTextStyle: TextStyle(
+                    color: Colors.deepOrange, fontWeight: FontWeight.bold),
+                // Use `CalendarStyle` to customize the UI
+                outsideDaysVisible: false,
+              ),
+              onDaySelected: _onDaySelected,
+              onRangeSelected: _onRangeSelected,
+              onFormatChanged: (format) {
+                if (_calendarFormat != format) {
+                  setState(() {
+                    _calendarFormat = format;
+                  });
+                }
+              },
+              onPageChanged: (focusedDay) {
+                _focusedDay = focusedDay;
+              },
             ),
-            calendarStyle: const CalendarStyle(
-              selectedDecoration:
-                  BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
-              markersMaxCount: 1,
-              // markerDecoration: BoxDecoration(),
-              markerSize: 5,
-              todayTextStyle:
-                  TextStyle(color: Colors.blue, fontWeight: FontWeight.w900),
-              todayDecoration: BoxDecoration(
-                  color: Colors.transparent, shape: BoxShape.circle),
-              isTodayHighlighted: true,
-              weekendTextStyle: TextStyle(
-                  color: Colors.deepOrange, fontWeight: FontWeight.bold),
-              // Use `CalendarStyle` to customize the UI
-              outsideDaysVisible: false,
-            ),
-            onDaySelected: _onDaySelected,
-            onRangeSelected: _onRangeSelected,
-            onFormatChanged: (format) {
-              if (_calendarFormat != format) {
-                setState(() {
-                  _calendarFormat = format;
-                });
-              }
-            },
-            onPageChanged: (focusedDay) {
-              _focusedDay = focusedDay;
-            },
-          ),
-          const SizedBox(height: 0),
-          Expanded(
-            child: _getEventsForDay(_selectedDay!).isEmpty
-                ? Transform.translate(
-                    offset: const Offset(0, 20),
-                    child: Container(
-                      margin: const EdgeInsets.all(0),
-                      decoration: BoxDecoration(
-                        color: Colors.blue,
-                        border: Border.all(color: Colors.blue, width: 2.5),
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(35),
-                          topRight: Radius.circular(35),
-                        ),
-                      ),
-                      child: Column(
-                        children: [
-                          const SizedBox(
-                            height: 3,
+            const SizedBox(height: 0),
+            Expanded(
+              child: _getEventsForDay(_selectedDay!).isEmpty
+                  ? Transform.translate(
+                      offset: const Offset(0, 20),
+                      child: Container(
+                        margin: const EdgeInsets.all(0),
+                        decoration: BoxDecoration(
+                          color: Colors.blue,
+                          border: Border.all(color: Colors.blue, width: 2.5),
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(35),
+                            topRight: Radius.circular(35),
                           ),
-                          Expanded(
-                            child: Center(
-                              child: Transform.translate(
-                                offset: const Offset(0, -20),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Icon(
-                                      CupertinoIcons.check_mark_circled,
-                                      color: Colors.white,
-                                      size: 80,
-                                    ),
-                                    const SizedBox(height: 5),
-                                    Container(
-                                      alignment: Alignment.center,
-                                      padding: const EdgeInsets.only(left: 15),
-                                      child: const Text(
-                                        '학습 할 내용이 없습니다!',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 20,
-                                        ),
-                                      ), //일정 없을 시
-                                    ),
-                                  ],
+                        ),
+                        child: Column(
+                          children: [
+                            const SizedBox(
+                              height: 3,
+                            ),
+                            Expanded(
+                              child: Center(
+                                child: Transform.translate(
+                                  offset: const Offset(0, -20),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(
+                                        CupertinoIcons.check_mark_circled,
+                                        color: Colors.white,
+                                        size: 80,
+                                      ),
+                                      const SizedBox(height: 5),
+                                      Container(
+                                        alignment: Alignment.center,
+                                        padding:
+                                            const EdgeInsets.only(left: 15),
+                                        child: const Text(
+                                          '학습 할 내용이 없습니다!',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 20,
+                                          ),
+                                        ), //일정 없을 시
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                : Transform.translate(
-                    offset: const Offset(0, 20),
-                    child: Container(
-                      padding: const EdgeInsets.all(10),
-                      margin: const EdgeInsets.all(0),
-                      decoration: BoxDecoration(
-                        color: Colors.blue,
-                        border: Border.all(color: Colors.blue, width: 2.5),
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(35),
-                          topRight: Radius.circular(35),
+                          ],
                         ),
                       ),
-                      child: ValueListenableBuilder<List<Event>>(
-                        valueListenable: _selectedEvents,
-                        builder: (context, value, _) {
-                          return ListView.builder(
-                            padding: const EdgeInsets.all(0),
-                            itemCount: value.length,
-                            itemBuilder: (context, index) {
-                              return Container(
-                                padding: const EdgeInsets.all(0),
-                                margin: const EdgeInsets.symmetric(
-                                  vertical: 4.0,
-                                ),
-                                decoration: const BoxDecoration(
-                                  border: Border(
-                                      bottom: BorderSide(
-                                          width: 1.5, color: Colors.white)),
-                                ),
-                                child: ListTile(
-                                  selectedTileColor: Colors.blueAccent,
-                                  trailing: value[index].checkState
-                                      ? const Icon(
-                                          CupertinoIcons
-                                              .check_mark_circled_solid,
-                                          color: Colors.white,
-                                        )
-                                      : const Icon(
-                                          CupertinoIcons.circle,
-                                          color: Colors.white,
-                                        ),
-                                  onTap: () => {
-                                    setState(() {
-                                      value[index].checkState =
-                                          !(value[index].checkState);
-                                    })
-                                  },
-                                  title: Text(
-                                    '${value[index]}',
-                                    style: TextStyle(
-                                      color: value[index].checkState
-                                          ? Colors.white.withOpacity(0.6)
-                                          : Colors.white,
-                                      fontSize: 14,
-                                      fontWeight: value[index].checkState
-                                          ? FontWeight.w700
-                                          : FontWeight.w700,
-                                      decoration: value[index].checkState
-                                          ? TextDecoration.lineThrough
-                                          : TextDecoration.none,
-                                      decorationColor: Colors.white,
-                                      decorationThickness: 2,
+                    )
+                  : Transform.translate(
+                      offset: const Offset(0, 20),
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        margin: const EdgeInsets.all(0),
+                        decoration: BoxDecoration(
+                          color: Colors.blue,
+                          border: Border.all(color: Colors.blue, width: 2.5),
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(35),
+                            topRight: Radius.circular(35),
+                          ),
+                        ),
+                        child: ValueListenableBuilder<List<Event>>(
+                          valueListenable: _selectedEvents,
+                          builder: (context, value, _) {
+                            return ListView.builder(
+                              padding: const EdgeInsets.all(0),
+                              itemCount: value.length,
+                              itemBuilder: (context, index) {
+                                return Container(
+                                  padding: const EdgeInsets.all(0),
+                                  margin: const EdgeInsets.symmetric(
+                                    vertical: 4.0,
+                                  ),
+                                  decoration: const BoxDecoration(
+                                    border: Border(
+                                        bottom: BorderSide(
+                                            width: 1.5, color: Colors.white)),
+                                  ),
+                                  child: ListTile(
+                                    enableFeedback: true,
+                                    // selectedTileColor: Colors.blueAccent,
+                                    trailing: value[index].checkState
+                                        ? const Icon(
+                                            CupertinoIcons
+                                                .check_mark_circled_solid,
+                                            color: Colors.white,
+                                          )
+                                        : const Icon(
+                                            CupertinoIcons.circle,
+                                            color: Colors.white,
+                                          ),
+                                    onTap: () => {
+                                      setState(() {
+                                        value[index].checkState =
+                                            !(value[index].checkState);
+                                      })
+                                    },
+                                    title: Text(
+                                      '${value[index]}',
+                                      style: TextStyle(
+                                        color: value[index].checkState
+                                            ? Colors.white.withOpacity(0.6)
+                                            : Colors.white,
+                                        fontSize: 14,
+                                        fontWeight: value[index].checkState
+                                            ? FontWeight.w700
+                                            : FontWeight.w700,
+                                        decoration: value[index].checkState
+                                            ? TextDecoration.lineThrough
+                                            : TextDecoration.none,
+                                        decorationColor: Colors.white,
+                                        decorationThickness: 2,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              );
-                            },
-                          );
-                        },
+                                );
+                              },
+                            );
+                          },
+                        ),
                       ),
                     ),
-                  ),
-          ),
-        ],
-      ),
-      floatingActionButton: Stack(
-        children: <Widget>[
-          // Align(
-          //   alignment: Alignment.bottomRight,
-          //   child: FloatingActionButton(
-          //     onPressed: () {
-          //       setState(() => _onDaySelected(DateTime.now(), DateTime.now()));
-          //     },
-          //     tooltip: 'TODAY',
-          //     child: const Icon(CupertinoIcons.refresh),
-          //   ),
-          // ),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: FloatingActionButton(
-              backgroundColor: Colors.white,
-              onPressed: () => print('asd'), //TODO: 일정추가/삭제 등등 구현
-              child: const Icon(
-                CupertinoIcons.add,
-                color: Colors.blue,
-                size: 25,
-              ),
             ),
+          ],
+        ),
+      ),
+      floatingActionButton: AnimatedOpacity(
+        opacity: _opacity,
+        curve: Curves.easeIn,
+        duration: const Duration(milliseconds: 250),
+        child: FloatingActionButton(
+          onPressed: () {
+            _onDaySelected(DateTime.now(), DateTime.now());
+          },
+          backgroundColor: Colors.white,
+          tooltip: 'TODAY',
+          child: const Icon(
+            CupertinoIcons.refresh,
+            color: Colors.blue,
           ),
-        ],
+        ),
       ),
     );
   }
