@@ -1,4 +1,5 @@
 import 'package:card_swiper/card_swiper.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -16,7 +17,7 @@ class _MyWidgetState extends State<MyWidget> with TickerProviderStateMixin {
   late Animation<double> _animation11;
   late Animation<double> _animation12;
   late Animation<double> _animation13;
-
+  final GlobalKey _paginationKey = GlobalKey();
   @override
   void dispose() {
     controller.dispose();
@@ -45,9 +46,9 @@ class _MyWidgetState extends State<MyWidget> with TickerProviderStateMixin {
         borderRadius: BorderRadius.circular(25),
         //set border radius more than 50% of height and width to make circle
       ),
-      elevation: 4.0,
+      elevation: 2.0,
       color: Colors.white,
-      child: Stack(
+      child: Column(
         children: [
           Column(
             children: [
@@ -63,76 +64,86 @@ class _MyWidgetState extends State<MyWidget> with TickerProviderStateMixin {
                     color: Colors.grey.shade300,
                   ),
                 ),
-                padding: const EdgeInsets.all(20.0),
-                child: Text(
-                  dateNameList[index],
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 42,
-                  ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 30, vertical: 13),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      dateNameList[index],
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25,
+                      ),
+                    ),
+                    Transform.translate(
+                      offset: const Offset(12, -2),
+                      child: const IconButton(
+                        onPressed: null,
+                        icon: Icon(
+                          CupertinoIcons.add_circled,
+                          size: 36,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-          Column(
-            children: <Widget>[
-              Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Column(
-                      children: <Widget>[
-                        Container(
-                          padding: const EdgeInsets.only(top: 40.0),
-                        ),
-                        ScaleTransition(
-                          scale: _animation10,
-                          alignment: FractionalOffset.center,
-                        ),
-                      ],
-                    ),
-                    Column(
-                      children: <Widget>[
-                        Container(
-                          padding: const EdgeInsets.only(top: 160.0),
-                        ),
-                        ScaleTransition(
-                          scale: _animation11,
-                          alignment: FractionalOffset.center,
-                        ),
-                      ],
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(1.0),
-                    ),
-                    Column(
-                      children: <Widget>[
-                        Container(
-                          padding: const EdgeInsets.only(top: 160.0),
-                        ),
-                        ScaleTransition(
-                          scale: _animation12,
-                          alignment: FractionalOffset.center,
-                        ),
-                      ],
-                    ),
-                    Column(
-                      children: <Widget>[
-                        Container(
-                          padding: const EdgeInsets.only(top: 40.0),
-                        ),
-                        ScaleTransition(
-                          scale: _animation13,
-                          alignment: FractionalOffset.center,
-                        ),
-                      ],
-                    ),
-                  ]),
-              Container(
-                padding: const EdgeInsets.all(10.0),
+          Expanded(
+            child: Container(
+              width: double.maxFinite,
+              decoration: const BoxDecoration(
+                // border: Border.all(width: 4),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(25),
+                  bottomRight: Radius.circular(25), // 리스트 박스 넘지마세요
+                ),
               ),
-            ],
-          )
+              child: SizedBox.expand(
+                child: ListView.builder(
+                  physics: const ScrollPhysics(),
+                  scrollDirection: Axis.vertical,
+                  itemCount: 4,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.all(0),
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 15),
+                        decoration: BoxDecoration(
+                          border: Border(
+                              bottom: BorderSide(
+                            width: 1,
+                            color: Colors.grey.shade400,
+                          )),
+                        ),
+                        child: ListTile(
+                          title: const Padding(
+                            padding: EdgeInsets.only(bottom: 3.0),
+                            child: Text(
+                              "개같은 자료구조",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          subtitle: const Text('23/03/02~23/06/30'),
+                          trailing: const Icon(
+                            CupertinoIcons.circle,
+                            // color: Colors.blue,
+                          ),
+                          onTap: () {},
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -158,17 +169,18 @@ class _MyWidgetState extends State<MyWidget> with TickerProviderStateMixin {
               child: Column(
                 children: [
                   Container(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       color: Colors.white,
                       border: Border(
                         bottom: BorderSide(
-                          color: Colors.blue,
+                          color: Colors.grey.shade300,
                           width: 2.5,
                         ),
                       ),
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.all(12.0),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12.0, horizontal: 20),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -216,23 +228,23 @@ class _MyWidgetState extends State<MyWidget> with TickerProviderStateMixin {
                   Expanded(
                     flex: 8,
                     child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Container(
-                        child: Swiper(
-                          outer: true,
-                          scale: 0.7,
-                          fade: 0.1,
-                          itemBuilder: (c, i) {
-                            return _buildDynamicCard(i);
-                          },
-                          pagination: SwiperPagination(
-                            builder: DotSwiperPaginationBuilder(
-                                color: Colors.grey.shade400),
-                            alignment: Alignment.center,
-                            margin: const EdgeInsets.all(12),
-                          ),
-                          itemCount: 5,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
+                      child: Swiper(
+                        outer: true,
+                        scale: 0.7,
+                        fade: 0.1,
+                        itemBuilder: (c, i) {
+                          return _buildDynamicCard(i);
+                        },
+                        pagination: SwiperPagination(
+                          key: _paginationKey,
+                          builder: DotSwiperPaginationBuilder(
+                              color: Colors.grey.shade400),
+                          alignment: Alignment.center,
+                          margin: const EdgeInsets.all(12),
                         ),
+                        itemCount: 5,
                       ),
                     ),
                   ),

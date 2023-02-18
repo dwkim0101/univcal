@@ -239,6 +239,7 @@ class _CalendarEventsState extends State<CalendarEvents> {
                             return ListView.builder(
                               padding: const EdgeInsets.all(0),
                               itemCount: value.length,
+                              physics: const ScrollPhysics(),
                               itemBuilder: (context, index) {
                                 return Container(
                                   padding: const EdgeInsets.all(0),
@@ -301,7 +302,7 @@ class _CalendarEventsState extends State<CalendarEvents> {
       floatingActionButton: AnimatedOpacity(
         opacity: _opacity,
         curve: Curves.easeIn,
-        duration: const Duration(milliseconds: 250),
+        duration: const Duration(milliseconds: 150),
         child: FloatingActionButton(
           onPressed: () {
             _onDaySelected(DateTime.now(), DateTime.now());

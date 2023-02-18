@@ -15,7 +15,8 @@ class StudyReminderView extends StatefulWidget {
   State<StudyReminderView> createState() => _StudyReminderViewState();
 }
 
-class _StudyReminderViewState extends State<StudyReminderView> {
+class _StudyReminderViewState extends State<StudyReminderView>
+    with TickerProviderStateMixin {
   List<int> currentReviewDays = [60, 28, 14, 7, 3, 1];
   late final ValueNotifier<List<Event>> _selectedEvents;
   final DateTime _focusedDay = DateTime.now();
@@ -24,9 +25,12 @@ class _StudyReminderViewState extends State<StudyReminderView> {
   @override
   void initState() {
     super.initState();
-
     _selectedDay = _focusedDay;
     _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
+  }
+
+  void _handleTabSelection() {
+    setState(() {});
   }
 
   @override
@@ -53,8 +57,12 @@ class _StudyReminderViewState extends State<StudyReminderView> {
                   alignment: Alignment.topLeft,
                   padding: const EdgeInsets.only(left: 15),
                   child: Text(
-                    '${dayVariable * -1}일전 학습내용',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    '${dayVariable * -1}일 전',
+                    style: TextStyle(
+                      color: Colors.grey.shade400,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
           Expanded(
@@ -72,20 +80,20 @@ class _StudyReminderViewState extends State<StudyReminderView> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const Icon(
-                                CupertinoIcons.check_mark_circled,
-                                color: Colors.blue,
-                                size: 100,
+                                CupertinoIcons.rays,
+                                color: Colors.grey,
+                                size: 60,
                               ),
                               const SizedBox(height: 15),
                               Container(
                                 alignment: Alignment.center,
                                 padding: const EdgeInsets.only(left: 15),
                                 child: Text(
-                                  '${dayVariable * -1} 일전 학습 내용이 없습니다!',
+                                  '${dayVariable * -1}일 전 학습내용이 없습니다!',
                                   style: const TextStyle(
-                                    color: Colors.blue,
+                                    color: Colors.grey,
                                     fontWeight: FontWeight.w600,
-                                    fontSize: 20,
+                                    fontSize: 18,
                                   ),
                                 ), //일정 없을 시
                               ),
@@ -102,6 +110,7 @@ class _StudyReminderViewState extends State<StudyReminderView> {
                       return ListView.builder(
                         padding: const EdgeInsets.all(0),
                         itemCount: value.length,
+                        physics: const ScrollPhysics(),
                         itemBuilder: (context, index) {
                           return Container(
                             padding: const EdgeInsets.all(0),
@@ -130,7 +139,7 @@ class _StudyReminderViewState extends State<StudyReminderView> {
                                     color: value[index].checkState
                                         ? Colors.grey
                                         : Colors.black,
-                                    fontSize: 14,
+                                    fontSize: 18,
                                     fontWeight: FontWeight.w600,
                                     decoration: value[index].checkState
                                         ? TextDecoration.lineThrough
@@ -161,7 +170,7 @@ class _StudyReminderViewState extends State<StudyReminderView> {
       ),
       body: Column(children: [
         Padding(
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 20),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -202,7 +211,7 @@ class _StudyReminderViewState extends State<StudyReminderView> {
                         return StatefulBuilder(builder:
                             (BuildContext context, StateSetter setState) {
                           return Container(
-                            height: 300, // 모달 높이 크기
+                            height: 350, // 모달 높이 크기
                             decoration: const BoxDecoration(
                               color: Colors.white, // 모달 배경색
                               borderRadius: BorderRadius.only(
@@ -285,17 +294,18 @@ class _StudyReminderViewState extends State<StudyReminderView> {
                                           (index) {
                                             return Column(
                                               children: [
-                                                //TODO: 모달 텍스트 필드 해결하기
-                                                // Container(
-                                                //   width: 50,
-                                                //   height: 50,
-                                                //   decoration: BoxDecoration(
-                                                //     border: Border.all(),
-                                                //     borderRadius:
-                                                //         BorderRadius.circular(
-                                                //             5),
-                                                //   ),
-                                                // ),
+                                                // TODO: 모달 텍스트 필드 해결하기
+                                                Container(
+                                                  width: 50,
+                                                  height: 50,
+                                                  decoration: BoxDecoration(
+                                                    border:
+                                                        Border.all(width: 0.5),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
+                                                  ),
+                                                ),
                                                 const SizedBox(
                                                   height: 5,
                                                 ),
@@ -329,7 +339,7 @@ class _StudyReminderViewState extends State<StudyReminderView> {
                 },
                 icon: const Icon(CupertinoIcons.gear_alt_fill),
                 iconSize: 35,
-                color: Colors.blue.withOpacity(1),
+                color: Colors.black.withOpacity(0.7),
               ),
             ],
           ),
@@ -343,13 +353,14 @@ class _StudyReminderViewState extends State<StudyReminderView> {
                   color: Colors.blue,
                   constraints: const BoxConstraints.expand(height: 50),
                   child: TabBar(
+                      // controller: _tabController,
                       dividerColor: Colors.white,
                       unselectedLabelStyle: const TextStyle(
                         fontWeight: FontWeight.normal,
                       ),
                       labelStyle: const TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 10,
+                        fontSize: 12,
                       ),
                       tabs: [
                         ...List<Tab>.generate(currentReviewDays.length,

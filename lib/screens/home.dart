@@ -19,11 +19,11 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     ),
     Tab(
       text: '학습',
-      icon: Icon(CupertinoIcons.pencil_circle),
+      icon: Icon(CupertinoIcons.calendar),
     ),
     Tab(
       text: '복습',
-      icon: Icon(CupertinoIcons.check_mark_circled),
+      icon: Icon(CupertinoIcons.text_badge_checkmark),
     ),
     Tab(
       text: '정보',
@@ -114,7 +114,7 @@ class _AnimatedTabBar extends State<AnimatedTabBar> {
     });
   }
 
-  final tabHeight = 70.0;
+  final tabHeight = 80.0;
 
   @override
   Widget build(BuildContext context) {
