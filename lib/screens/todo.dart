@@ -190,10 +190,10 @@ class _StudyReminderViewState extends State<StudyReminderView>
                   ),
                   Text(
                     DateFormat("MM월 dd일").format(DateTime.now()),
-                    style: const TextStyle(
-                      color: Colors.blue,
+                    style: TextStyle(
+                      color: Colors.grey.shade600,
                       fontSize: 15,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
