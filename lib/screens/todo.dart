@@ -89,10 +89,10 @@ class _StudyReminderViewState extends State<StudyReminderView>
                                 alignment: Alignment.center,
                                 padding: const EdgeInsets.only(left: 15),
                                 child: Text(
-                                  '${dayVariable * -1}일 전 학습내용이 없습니다!',
+                                  '${dayVariable * -1}일 전 학습내용이 없습니다',
                                   style: const TextStyle(
                                     color: Colors.grey,
-                                    fontWeight: FontWeight.w600,
+                                    fontWeight: FontWeight.w500,
                                     fontSize: 18,
                                   ),
                                 ), //일정 없을 시
@@ -108,7 +108,7 @@ class _StudyReminderViewState extends State<StudyReminderView>
                         _selectedDay!.add(Duration(days: dayVariable)))),
                     builder: (context, value, _) {
                       return ListView.builder(
-                        padding: const EdgeInsets.all(0),
+                        padding: const EdgeInsets.symmetric(horizontal: 7),
                         itemCount: value.length,
                         physics: const ScrollPhysics(),
                         itemBuilder: (context, index) {
@@ -140,7 +140,7 @@ class _StudyReminderViewState extends State<StudyReminderView>
                                         ? Colors.grey
                                         : Colors.black,
                                     fontSize: 18,
-                                    fontWeight: FontWeight.w600,
+                                    fontWeight: FontWeight.w500,
                                     decoration: value[index].checkState
                                         ? TextDecoration.lineThrough
                                         : TextDecoration.none),
@@ -338,8 +338,8 @@ class _StudyReminderViewState extends State<StudyReminderView>
                       });
                 },
                 icon: const Icon(CupertinoIcons.gear_alt_fill),
-                iconSize: 35,
-                color: Colors.black.withOpacity(0.7),
+                iconSize: 30,
+                color: Colors.black.withOpacity(0.5),
               ),
             ],
           ),

@@ -173,8 +173,9 @@ class _CalendarEventsState extends State<CalendarEvents> {
                       child: Container(
                         margin: const EdgeInsets.all(0),
                         decoration: BoxDecoration(
-                          color: Colors.blue,
-                          border: Border.all(color: Colors.blue, width: 2.5),
+                          color: Colors.grey.shade500,
+                          border: Border.all(
+                              color: Colors.grey.shade500, width: 2.5),
                           borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(35),
                             topRight: Radius.circular(35),
@@ -193,20 +194,20 @@ class _CalendarEventsState extends State<CalendarEvents> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       const Icon(
-                                        CupertinoIcons.check_mark_circled,
+                                        CupertinoIcons.rays,
                                         color: Colors.white,
-                                        size: 80,
+                                        size: 60,
                                       ),
-                                      const SizedBox(height: 5),
+                                      const SizedBox(height: 10),
                                       Container(
                                         alignment: Alignment.center,
                                         padding:
                                             const EdgeInsets.only(left: 15),
                                         child: const Text(
-                                          '학습 할 내용이 없습니다!',
+                                          '학습 할 내용이 없습니다',
                                           style: TextStyle(
                                             color: Colors.white,
-                                            fontWeight: FontWeight.w600,
+                                            fontWeight: FontWeight.w500,
                                             fontSize: 20,
                                           ),
                                         ), //일정 없을 시

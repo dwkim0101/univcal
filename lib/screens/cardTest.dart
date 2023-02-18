@@ -12,6 +12,15 @@ class MyWidget extends StatefulWidget {
 
 class _MyWidgetState extends State<MyWidget> with TickerProviderStateMixin {
   final List<String> dateNameList = ['월', '화', '수', '목', '금', '토', '일'];
+  final List<String> dateNameListEng = [
+    'MON',
+    'TUE',
+    'WED',
+    'THUR',
+    'FRI',
+    'SAT',
+    'SUN'
+  ];
   late AnimationController controller;
   late Animation<double> _animation10;
   late Animation<double> _animation11;
@@ -69,21 +78,37 @@ class _MyWidgetState extends State<MyWidget> with TickerProviderStateMixin {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      dateNameList[index],
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 25,
-                      ),
+                    Row(
+                      // crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          dateNameList[index],
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 25,
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          dateNameListEng[index],
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.7),
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ],
                     ),
                     Transform.translate(
-                      offset: const Offset(12, -2),
+                      offset: const Offset(12, 0),
                       child: const IconButton(
                         onPressed: null,
                         icon: Icon(
                           CupertinoIcons.add_circled,
-                          size: 36,
+                          size: 30,
                           color: Colors.white,
                         ),
                       ),
