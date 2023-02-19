@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:univcal/screens/calendar.dart';
-import 'package:univcal/screens/cardTest.dart';
+import 'package:univcal/screens/timetable.dart';
 import 'package:univcal/screens/info.dart';
 import 'package:univcal/screens/todo.dart';
 

@@ -17,7 +17,11 @@ class StudyReminderView extends StatefulWidget {
 
 class _StudyReminderViewState extends State<StudyReminderView>
     with TickerProviderStateMixin {
-  List<int> currentReviewDays = [60, 28, 14, 7, 3, 1];
+  List<int> currentReviewDays = [60, 28, 14, 7, 3, 1]; //TODO: 전역으로 사용해야하는 변수
+  List<TextEditingController> _text = [];
+  List<bool> _validate = List.filled(6, false, growable: true);
+  int _trueLength = 0;
+
   late final ValueNotifier<List<Event>> _selectedEvents;
   final DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
@@ -25,12 +29,11 @@ class _StudyReminderViewState extends State<StudyReminderView>
   @override
   void initState() {
     super.initState();
+    for (int i = 0; i < currentReviewDays.length; i++) {
+      _text.add(TextEditingController());
+    }
     _selectedDay = _focusedDay;
     _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
-  }
-
-  void _handleTabSelection() {
-    setState(() {});
   }
 
   @override
@@ -202,133 +205,205 @@ class _StudyReminderViewState extends State<StudyReminderView>
                 onPressed: () {
                   int currentReviewDaysLength = currentReviewDays.length;
                   showModalBottomSheet(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(40.0),
-                      ),
+                      shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(25.0))),
+                      backgroundColor: Colors.white,
                       context: context,
                       isScrollControlled: true,
                       builder: (context) {
                         return StatefulBuilder(builder:
                             (BuildContext context, StateSetter setState) {
-                          return Container(
-                            height: 350, // 모달 높이 크기
-                            decoration: const BoxDecoration(
-                              color: Colors.white, // 모달 배경색
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(50), // 모달 좌상단 라운딩 처리
-                                topRight: Radius.circular(50), // 모달 우상단 라운딩 처리
-                              ),
-                            ),
+                          @override
+                          void initState() {
+                            for (int i = 0; i < 6; i++) {
+                              _text.add(TextEditingController());
+                            }
+                          }
+
+                          return Padding(
+                            padding: EdgeInsets.only(
+                                bottom:
+                                    MediaQuery.of(context).viewInsets.bottom),
                             child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                const SizedBox(height: 30),
-                                const Text(
-                                  '복습 일자 지정',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 25),
-                                ),
-                                const SizedBox(height: 4),
-                                const Text(
-                                  '복습 일자를 지정해주세요. 복습은 1 ~ 6 회를 지원합니다.',
-                                  style: TextStyle(fontSize: 12),
-                                ),
-                                const SizedBox(height: 2),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    IconButton(
-                                      color: Colors.blue,
-                                      onPressed: currentReviewDaysLength >= 2
-                                          ? () {
-                                              setState(() {
-                                                currentReviewDaysLength =
-                                                    currentReviewDaysLength - 1;
-                                              });
-                                            }
-                                          : null,
-                                      icon: const Icon(
-                                          CupertinoIcons.minus_circle_fill),
-                                    ),
-                                    Container(
-                                      height: 40,
-                                      width: 40,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        shape: BoxShape.circle,
-                                        border: Border.all(color: Colors.white),
-                                      ),
-                                      child: Text(
-                                        '$currentReviewDaysLength',
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(
-                                            fontSize: 30, color: Colors.blue),
-                                      ),
-                                    ),
-                                    IconButton(
-                                      color: Colors.blue,
-                                      onPressed: currentReviewDaysLength <= 5
-                                          ? () {
-                                              setState(() {
-                                                currentReviewDaysLength =
-                                                    currentReviewDaysLength + 1;
-                                              });
-                                            }
-                                          : null,
-                                      icon: const Icon(
-                                          CupertinoIcons.add_circled_solid),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
+                                // const SizedBox(height: 30),
                                 Column(
                                   children: [
+                                    const SizedBox(height: 20),
+                                    const Text(
+                                      '복습 일자 지정',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 25),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    const Text(
+                                      '복습 일자를 지정해주세요. 복습은 1 ~ 6 회를 지원합니다.',
+                                      style: TextStyle(fontSize: 12),
+                                    ),
+                                    const SizedBox(height: 2),
                                     Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
+                                          MainAxisAlignment.center,
                                       children: [
-                                        ...List<Widget>.generate(
-                                          currentReviewDaysLength,
-                                          (index) {
-                                            return Column(
-                                              children: [
-                                                // TODO: 모달 텍스트 필드 해결하기
-                                                Container(
-                                                  width: 50,
-                                                  height: 50,
-                                                  decoration: BoxDecoration(
-                                                    border:
-                                                        Border.all(width: 0.5),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5),
-                                                  ),
-                                                ),
-                                                const SizedBox(
-                                                  height: 5,
-                                                ),
-                                                Text(
-                                                  '${index + 1}회차',
-                                                  style: const TextStyle(
-                                                      fontSize: 12),
-                                                ),
-                                              ],
-                                            );
-                                          },
+                                        IconButton(
+                                          color: Colors.blue,
+                                          onPressed:
+                                              currentReviewDaysLength >= 2
+                                                  ? () {
+                                                      setState(() {
+                                                        currentReviewDaysLength =
+                                                            currentReviewDaysLength -
+                                                                1;
+                                                      });
+                                                    }
+                                                  : null,
+                                          icon: const Icon(
+                                              CupertinoIcons.minus_circle_fill),
+                                        ),
+                                        Container(
+                                          height: 40,
+                                          width: 40,
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            shape: BoxShape.circle,
+                                            border:
+                                                Border.all(color: Colors.white),
+                                          ),
+                                          child: Text(
+                                            '$currentReviewDaysLength',
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                                fontSize: 30,
+                                                color: Colors.blue),
+                                          ),
+                                        ),
+                                        IconButton(
+                                          color: Colors.blue,
+                                          onPressed:
+                                              currentReviewDaysLength <= 5
+                                                  ? () {
+                                                      setState(() {
+                                                        currentReviewDaysLength =
+                                                            currentReviewDaysLength +
+                                                                1;
+                                                      });
+                                                    }
+                                                  : null,
+                                          icon: const Icon(
+                                              CupertinoIcons.add_circled_solid),
                                         ),
                                       ],
                                     ),
                                     const SizedBox(
-                                      height: 10,
+                                      height: 4,
+                                    ),
+                                    Column(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            ...List<Widget>.generate(
+                                              currentReviewDaysLength,
+                                              (index) {
+                                                return Column(
+                                                  children: [
+                                                    SizedBox(
+                                                      width: 50,
+                                                      height: 50,
+                                                      child: TextField(
+                                                        controller:
+                                                            _text[index],
+                                                        keyboardType:
+                                                            TextInputType
+                                                                .number,
+                                                        inputFormatters: <
+                                                            TextInputFormatter>[
+                                                          FilteringTextInputFormatter
+                                                              .digitsOnly
+                                                        ], // Only numbers can be entered
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        decoration:
+                                                            InputDecoration(
+                                                          errorText:
+                                                              _validate[index]
+                                                                  ? '값 입력'
+                                                                  : null,
+                                                          hintText: (currentReviewDays
+                                                                          .length -
+                                                                      1 <
+                                                                  index)
+                                                              ? '0'
+                                                              : currentReviewDays[
+                                                                      index]
+                                                                  .toString(),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 5,
+                                                    ),
+                                                    Text(
+                                                      '${index + 1}회차',
+                                                      style: const TextStyle(
+                                                          fontSize: 12),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(
+                                      height: 40,
                                     ),
                                     ElevatedButton(
                                       child: const Text('저장'),
-                                      onPressed: () => super.setState(() {
-                                        Navigator.pop(context);
-                                      }),
+                                      onPressed: () {
+                                        setState(() {
+                                          _trueLength = 0;
+                                          for (int i = 0;
+                                              i < currentReviewDaysLength;
+                                              i++) {
+                                            if (_text[i].text.isEmpty) {
+                                              _validate[i] = true;
+                                            } else {
+                                              _validate[i] = false;
+                                              _trueLength += 1;
+                                            }
+                                          }
+                                          if (currentReviewDaysLength ==
+                                              _trueLength) {
+                                            currentReviewDays = [];
+                                            for (int i = 0;
+                                                i < currentReviewDaysLength;
+                                                i++) {
+                                              currentReviewDays.add(
+                                                  int.parse(_text[i].text));
+                                            }
+                                            _text = [];
+                                            for (int i = 0; i < 6; i++) {
+                                              _text
+                                                  .add(TextEditingController());
+                                            }
+                                            _validate = List.filled(6, false);
+                                            super.setState(() {
+                                              Navigator.pop(context);
+                                            });
+                                          }
+                                        });
+                                      },
                                     ),
+                                    const SizedBox(
+                                      height: 50,
+                                    )
                                   ],
                                 ),
                               ],
@@ -346,7 +421,7 @@ class _StudyReminderViewState extends State<StudyReminderView>
         ),
         Expanded(
           child: DefaultTabController(
-            length: 6,
+            length: currentReviewDays.length,
             child: Column(
               children: <Widget>[
                 Container(
