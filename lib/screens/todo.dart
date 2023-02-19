@@ -243,7 +243,7 @@ class _StudyReminderViewState extends State<StudyReminderView>
                                           MainAxisAlignment.center,
                                       children: [
                                         IconButton(
-                                          splashRadius: 20,
+                                          splashRadius: 25,
                                           color: Colors.blue,
                                           onPressed:
                                               currentReviewDaysLength >= 2
@@ -276,7 +276,7 @@ class _StudyReminderViewState extends State<StudyReminderView>
                                           ),
                                         ),
                                         IconButton(
-                                          splashRadius: 20,
+                                          splashRadius: 25,
                                           color: Colors.blue,
                                           onPressed:
                                               currentReviewDaysLength <= 5
