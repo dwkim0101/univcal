@@ -214,13 +214,6 @@ class _StudyReminderViewState extends State<StudyReminderView>
                       builder: (context) {
                         return StatefulBuilder(builder:
                             (BuildContext context, StateSetter setState) {
-                          @override
-                          void initState() {
-                            for (int i = 0; i < 6; i++) {
-                              _text.add(TextEditingController());
-                            }
-                          }
-
                           return Padding(
                             padding: EdgeInsets.only(
                                 bottom:
@@ -250,6 +243,7 @@ class _StudyReminderViewState extends State<StudyReminderView>
                                           MainAxisAlignment.center,
                                       children: [
                                         IconButton(
+                                          splashRadius: 20,
                                           color: Colors.blue,
                                           onPressed:
                                               currentReviewDaysLength >= 2
@@ -282,6 +276,7 @@ class _StudyReminderViewState extends State<StudyReminderView>
                                           ),
                                         ),
                                         IconButton(
+                                          splashRadius: 20,
                                           color: Colors.blue,
                                           onPressed:
                                               currentReviewDaysLength <= 5
