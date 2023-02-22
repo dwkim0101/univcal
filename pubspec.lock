@@ -131,6 +131,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.8.0"
+  modal_bottom_sheet:
+    dependency: "direct main"
+    description:
+      name: modal_bottom_sheet
+      sha256: "3bba63c62d35c931bce7f8ae23a47f9a05836d8cb3c11122ada64e0b2f3d718f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.0-pre"
   path:
     dependency: transitive
     description:
@@ -184,6 +192,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
+  syncfusion_flutter_core:
+    dependency: transitive
+    description:
+      name: syncfusion_flutter_core
+      sha256: "33141f9073c607bd113898d241aa6a03ccc1856a314bd061015180c35d47012f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "20.4.50"
+  syncfusion_flutter_datepicker:
+    dependency: "direct main"
+    description:
+      name: syncfusion_flutter_datepicker
+      sha256: "19f90a9e70c9edf5c23f900af224dea1e12fd9b2108ab528098c3cfd7508c57a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "20.4.50"
   table_calendar:
     dependency: "direct main"
     description:
@@ -218,4 +242,4 @@ packages:
     version: "2.1.4"
 sdks:
   dart: ">=2.19.0 <3.0.0"
-  flutter: ">=1.17.0"
+  flutter: ">=3.7.0"

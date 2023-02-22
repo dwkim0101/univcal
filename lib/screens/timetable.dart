@@ -2,6 +2,8 @@ import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:univcal/screens/eventmodifier.dart';
 
 class MyWidget extends StatefulWidget {
   const MyWidget({super.key});
@@ -96,9 +98,13 @@ class _MyWidgetState extends State<MyWidget> with TickerProviderStateMixin {
                     ),
                     Transform.translate(
                       offset: const Offset(12, 0),
-                      child: const IconButton(
-                        onPressed: null,
-                        icon: Icon(
+                      child: IconButton(
+                        onPressed: () => showBarModalBottomSheet(
+                          context: context,
+                          expand: true,
+                          builder: (context) => const eventAddScreen(),
+                        ),
+                        icon: const Icon(
                           CupertinoIcons.add_circled,
                           size: 30,
                           color: Colors.white,
