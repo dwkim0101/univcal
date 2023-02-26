@@ -300,107 +300,107 @@ class _CalendarEventsState extends State<CalendarEvents> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => showModalBottomSheet(
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(25.0))),
-          backgroundColor: Colors.white,
-          context: context,
-          isScrollControlled: true,
-          builder: (context) {
-            return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-                return Padding(
-                  padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        height: 100,
-                        width: double.infinity,
-                        decoration: const BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(25),
-                            topRight: Radius.circular(25),
-                          ),
-                          color: Colors.blue,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(30.0),
-                          child: Transform.translate(
-                            offset: const Offset(0, 15),
-                            child: const Text(
-                              '강의 추가',
-                              style: TextStyle(
-                                  fontSize: 35,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold),
+        onPressed: () => {
+          textController.text =
+              DateFormat('yyyy/MM/dd').format(_selectedDay ?? DateTime.now()),
+          showModalBottomSheet(
+            shape: const RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.vertical(top: Radius.circular(25.0))),
+            backgroundColor: Colors.white,
+            context: context,
+            isScrollControlled: true,
+            builder: (context) {
+              return StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+                  return Padding(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          height: 100,
+                          width: double.infinity,
+                          decoration: const BoxDecoration(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(25),
+                              topRight: Radius.circular(25),
                             ),
+                            color: Colors.blue,
                           ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 30, vertical: 10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const TextField(
-                              decoration: InputDecoration(hintText: '제목'),
-                            ),
-                            const SizedBox(height: 15),
-                            const Text(
-                              '일자',
-                              style: TextStyle(
-                                color: Colors.grey,
+                          child: Padding(
+                            padding: const EdgeInsets.all(30.0),
+                            child: Transform.translate(
+                              offset: const Offset(0, 15),
+                              child: const Text(
+                                '강의 추가',
+                                style: TextStyle(
+                                    fontSize: 35,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
                               ),
                             ),
-                            TextField(
-                              controller: textController,
-                              showCursor: false,
-                              onTap: () => showDatePicker(
-                                context: context,
-                                initialDate: _selectedDay ?? DateTime.now(),
-                                firstDate: DateTime(2000),
-                                lastDate: DateTime(2100),
-                              ),
-                            ),
-                            const SizedBox(height: 15),
-                            ButtonBar(
-                              children: <Widget>[
-                                ElevatedButton(
-                                  child: const Text('취소'),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                                ElevatedButton(
-                                  child: const Text('저장'),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.grey,
                           ),
                         ),
-                      )
-                    ],
-                  ),
-                );
-              },
-            );
-          },
-        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 30, vertical: 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const TextField(
+                                decoration: InputDecoration(hintText: '제목'),
+                              ),
+                              const SizedBox(height: 15),
+                              const Text(
+                                '일자',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              TextField(
+                                controller: textController,
+                                showCursor: false,
+                                onTap: () => _selectDate(context),
+                              ),
+                              const SizedBox(height: 15),
+                              ButtonBar(
+                                children: <Widget>[
+                                  ElevatedButton(
+                                    child: const Text('취소'),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                  ElevatedButton(
+                                    child: const Text('저장'),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.grey,
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        },
         backgroundColor: Colors.white,
         tooltip: 'ADD EVENT',
         child: const Icon(
@@ -409,5 +409,19 @@ class _CalendarEventsState extends State<CalendarEvents> {
         ),
       ),
     );
+  }
+
+  Future _selectDate(BuildContext context) async {
+    final DateTime? selected = await showDatePicker(
+      context: context,
+      initialDate: _selectedDay ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (selected != null) {
+      setState(() {
+        textController.text = DateFormat('yyyy/MM/dd').format(selected);
+      });
+    }
   }
 }
