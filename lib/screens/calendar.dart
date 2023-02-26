@@ -4,13 +4,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:univcal/screens/daily_add_screen.dart';
 
 import '../utils.dart';
-
-DateTime? _selectedDay;
 
 class CalendarEvents extends StatefulWidget {
   const CalendarEvents({super.key});
@@ -20,12 +17,14 @@ class CalendarEvents extends StatefulWidget {
 }
 
 class _CalendarEventsState extends State<CalendarEvents> {
+  final textController = TextEditingController();
   late final ValueNotifier<List<Event>> _selectedEvents;
   CalendarFormat _calendarFormat = CalendarFormat.month;
   RangeSelectionMode _rangeSelectionMode = RangeSelectionMode
       .toggledOff; // Can be toggled on/off by longpressing a date
   DateTime _focusedDay = DateTime.now();
 
+  DateTime? _selectedDay;
   DateTime? _rangeStart;
   DateTime? _rangeEnd;
 
@@ -34,6 +33,8 @@ class _CalendarEventsState extends State<CalendarEvents> {
     super.initState();
 
     _selectedDay = _focusedDay;
+    textController.text =
+        DateFormat('yyyy/MM/dd').format(_selectedDay ?? DateTime.now());
     _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
   }
 
@@ -67,6 +68,8 @@ class _CalendarEventsState extends State<CalendarEvents> {
         _rangeSelectionMode = RangeSelectionMode.toggledOff;
       });
       _selectedEvents.value = _getEventsForDay(selectedDay);
+      textController.text =
+          DateFormat('yyyy/MM/dd').format(_selectedDay ?? DateTime.now());
     }
   }
 
@@ -297,10 +300,106 @@ class _CalendarEventsState extends State<CalendarEvents> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => showBarModalBottomSheet(
+        onPressed: () => showModalBottomSheet(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(25.0))),
+          backgroundColor: Colors.white,
           context: context,
-          expand: true,
-          builder: (context) => const DailyEventAddScreen(),
+          isScrollControlled: true,
+          builder: (context) {
+            return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return Padding(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        height: 100,
+                        width: double.infinity,
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(25),
+                            topRight: Radius.circular(25),
+                          ),
+                          color: Colors.blue,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(30.0),
+                          child: Transform.translate(
+                            offset: const Offset(0, 15),
+                            child: const Text(
+                              '강의 추가',
+                              style: TextStyle(
+                                  fontSize: 35,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 30, vertical: 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const TextField(
+                              decoration: InputDecoration(hintText: '제목'),
+                            ),
+                            const SizedBox(height: 15),
+                            const Text(
+                              '일자',
+                              style: TextStyle(
+                                color: Colors.grey,
+                              ),
+                            ),
+                            TextField(
+                              controller: textController,
+                              showCursor: false,
+                              onTap: () => showDatePicker(
+                                context: context,
+                                initialDate: _selectedDay ?? DateTime.now(),
+                                firstDate: DateTime(2000),
+                                lastDate: DateTime(2100),
+                              ),
+                            ),
+                            const SizedBox(height: 15),
+                            ButtonBar(
+                              children: <Widget>[
+                                ElevatedButton(
+                                  child: const Text('취소'),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                                ElevatedButton(
+                                  child: const Text('저장'),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.grey,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                );
+              },
+            );
+          },
         ),
         backgroundColor: Colors.white,
         tooltip: 'ADD EVENT',

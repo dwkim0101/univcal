@@ -388,6 +388,8 @@ class _StudyReminderViewState extends State<StudyReminderView>
                                                   i++) {
                                                 currentReviewDays.add(
                                                     int.parse(_text[i].text));
+                                                currentReviewDays.sort(
+                                                    (b, a) => a.compareTo(b));
                                               }
                                               _text = [];
                                               for (int i = 0; i < 6; i++) {

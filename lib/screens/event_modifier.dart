@@ -136,23 +136,27 @@ class EventAddScreenState extends State<EventAddScreen> {
                     // backgroundColor: Colors.transparent,
                     context: context,
                     expand: true,
-                    builder: (context) => SfDateRangePicker(
-                          onSubmit: (p0) => {
-                            textController.text = _range,
-                            Navigator.pop(context)
-                          },
-                          onCancel: () => Navigator.pop(context),
-                          navigationMode: DateRangePickerNavigationMode.scroll,
-                          navigationDirection:
-                              DateRangePickerNavigationDirection.vertical,
-                          onSelectionChanged: _onSelectionChanged,
-                          selectionMode:
-                              DateRangePickerSelectionMode.extendableRange,
-                          showTodayButton: true,
-                          showActionButtons: true,
-                          enableMultiView: true,
-                          cancelText: '취소',
-                          confirmText: '선택',
+                    builder: (context) => Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: SfDateRangePicker(
+                            onSubmit: (p0) => {
+                              textController.text = _range,
+                              Navigator.pop(context)
+                            },
+                            onCancel: () => Navigator.pop(context),
+                            navigationMode:
+                                DateRangePickerNavigationMode.scroll,
+                            navigationDirection:
+                                DateRangePickerNavigationDirection.vertical,
+                            onSelectionChanged: _onSelectionChanged,
+                            selectionMode:
+                                DateRangePickerSelectionMode.extendableRange,
+                            showTodayButton: true,
+                            showActionButtons: true,
+                            enableMultiView: true,
+                            cancelText: '취소',
+                            confirmText: '선택',
+                          ),
                         )),
                 controller: textController,
                 enabled: true,
@@ -181,13 +185,13 @@ class EventAddScreenState extends State<EventAddScreen> {
             ],
           ),
         ),
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Colors.grey,
-            ),
-          ),
-        )
+        // Container(
+        //   decoration: BoxDecoration(
+        //     border: Border.all(
+        //       color: Colors.grey,
+        //     ),
+        //   ),
+        // )
       ],
     );
   }
