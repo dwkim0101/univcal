@@ -17,7 +17,7 @@ class StudyReminderView extends StatefulWidget {
 
 class _StudyReminderViewState extends State<StudyReminderView>
     with TickerProviderStateMixin {
-  List<int> currentReviewDays = [60, 28, 14, 7, 3, 1]; //TODO: 전역으로 사용해야하는 변수
+  List<int> currentReviewDays = [60, 28, 14, 7, 3, 1];
   List<TextEditingController> _text = [];
   List<bool> _validate = List.filled(6, false, growable: true);
   int _trueLength = 0;
@@ -206,6 +206,9 @@ class _StudyReminderViewState extends State<StudyReminderView>
                 child: IconButton(
                   onPressed: () {
                     int currentReviewDaysLength = currentReviewDays.length;
+                    for (int i = 0; i < currentReviewDaysLength; i++) {
+                      _validate[i] = false;
+                    }
                     showModalBottomSheet(
                         shape: const RoundedRectangleBorder(
                             borderRadius: BorderRadius.vertical(
@@ -399,11 +402,11 @@ class _StudyReminderViewState extends State<StudyReminderView>
                                           });
                                         },
                                       ),
-                                      const SizedBox(
-                                        height: 50,
-                                      )
                                     ],
                                   ),
+                                  const SizedBox(
+                                    height: 50,
+                                  )
                                 ],
                               ),
                             ); // 모달 내부 디자인 영역

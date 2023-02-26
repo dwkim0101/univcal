@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:univcal/screens/eventmodifier.dart';
+import 'package:univcal/screens/event_modifier.dart';
 
 class MyWidget extends StatefulWidget {
   const MyWidget({super.key});
@@ -102,7 +102,7 @@ class _MyWidgetState extends State<MyWidget> with TickerProviderStateMixin {
                         onPressed: () => showBarModalBottomSheet(
                           context: context,
                           expand: true,
-                          builder: (context) => const eventAddScreen(),
+                          builder: (context) => const EventAddScreen(),
                         ),
                         icon: const Icon(
                           CupertinoIcons.add_circled,

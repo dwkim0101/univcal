@@ -4,9 +4,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:univcal/screens/daily_add_screen.dart';
 
 import '../utils.dart';
+
+DateTime? _selectedDay;
 
 class CalendarEvents extends StatefulWidget {
   const CalendarEvents({super.key});
@@ -16,13 +20,12 @@ class CalendarEvents extends StatefulWidget {
 }
 
 class _CalendarEventsState extends State<CalendarEvents> {
-  double _opacity = 0;
   late final ValueNotifier<List<Event>> _selectedEvents;
   CalendarFormat _calendarFormat = CalendarFormat.month;
   RangeSelectionMode _rangeSelectionMode = RangeSelectionMode
       .toggledOff; // Can be toggled on/off by longpressing a date
   DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay;
+
   DateTime? _rangeStart;
   DateTime? _rangeEnd;
 
@@ -63,13 +66,6 @@ class _CalendarEventsState extends State<CalendarEvents> {
         _rangeEnd = null;
         _rangeSelectionMode = RangeSelectionMode.toggledOff;
       });
-      if (isSameDay(_focusedDay, DateTime.now())) {
-        setState(() {
-          _opacity = 0;
-        });
-      } else {
-        _opacity = 1;
-      }
       _selectedEvents.value = _getEventsForDay(selectedDay);
     }
   }
@@ -300,20 +296,17 @@ class _CalendarEventsState extends State<CalendarEvents> {
           ],
         ),
       ),
-      floatingActionButton: AnimatedOpacity(
-        opacity: _opacity,
-        curve: Curves.easeIn,
-        duration: const Duration(milliseconds: 150),
-        child: FloatingActionButton(
-          onPressed: () {
-            _onDaySelected(DateTime.now(), DateTime.now());
-          },
-          backgroundColor: Colors.white,
-          tooltip: 'TODAY',
-          child: const Icon(
-            CupertinoIcons.refresh,
-            color: Colors.blue,
-          ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => showBarModalBottomSheet(
+          context: context,
+          expand: true,
+          builder: (context) => const DailyEventAddScreen(),
+        ),
+        backgroundColor: Colors.white,
+        tooltip: 'ADD EVENT',
+        child: const Icon(
+          CupertinoIcons.add,
+          color: Colors.blue,
         ),
       ),
     );
