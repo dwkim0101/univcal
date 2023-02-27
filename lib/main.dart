@@ -6,6 +6,7 @@ import 'package:univcal/utils.dart';
 
 void main() async {
   Hive.registerAdapter(RepeatableEventAdapter());
+  Hive.registerAdapter(EventAdapter());
   await Hive.initFlutter();
   await Hive.openBox('myBox');
   runApp(const MyApp());

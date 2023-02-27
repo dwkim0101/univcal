@@ -18,16 +18,8 @@ class EventAddScreen extends StatefulWidget {
 class EventAddScreenState extends State<EventAddScreen> {
   final box = Hive.box('mybox');
   // ignore: prefer_final_fields
-  List<bool> _selectedWeekdays = <bool>[
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false
-  ];
-
+  List<bool> _selectedWeekdays = List.filled(7, false);
+  bool validateTitle = false;
   final List<Text> dateNameList = [
     const Text('월'),
     const Text('화'),
@@ -65,20 +57,20 @@ class EventAddScreenState extends State<EventAddScreen> {
   @override
   void initState() {
     textController.text = _range;
-    repeatingEvents =
-        box.get('repeatingEvents', defaultValue: <RepeatableEvent>[]);
-    for (RepeatableEvent _ in repeatingEvents) {
-      _.printNewClass();
-    }
+    repeatingEvents = box.get('repeatingEvents',
+        defaultValue: <RepeatableEvent>[]).cast<RepeatableEvent>();
+    // for (RepeatableEvent _ in repeatingEvents) {
+    //   _.printNewClass();
+    // }
     super.initState();
   }
 
   @override
   void dispose() {
     box.put('repeatingEvents', repeatingEvents);
-    for (RepeatableEvent _ in repeatingEvents) {
-      _.printNewClass();
-    }
+    // for (RepeatableEvent _ in repeatingEvents) {
+    //   _.printNewClass();
+    // }
     super.dispose();
   }
 
@@ -113,7 +105,10 @@ class EventAddScreenState extends State<EventAddScreen> {
             children: [
               TextField(
                 controller: titleTextController,
-                decoration: const InputDecoration(hintText: '제목'),
+                decoration: InputDecoration(
+                  hintText: '제목',
+                  errorText: validateTitle ? '값 입력' : null,
+                ),
               ),
               const SizedBox(height: 15),
               const Text(
@@ -133,7 +128,8 @@ class EventAddScreenState extends State<EventAddScreen> {
                 },
                 borderRadius: const BorderRadius.all(Radius.circular(8)),
                 // selectedBorderColor: Colors.green[700],
-                selectedColor: Colors.black,
+                // selectedColor: Colors.grey,
+                // selectedBorderColor: Colors.blue,
                 // fillColor: Colors.blue,
                 // color: Colors.blue,
                 isSelected: _selectedWeekdays,
@@ -195,14 +191,22 @@ class EventAddScreenState extends State<EventAddScreen> {
                   ElevatedButton(
                     child: const Text('저장'),
                     onPressed: () {
-                      repeatingEvents.add(RepeatableEvent(
-                        title: titleTextController.text,
-                        startDay: _startDay,
-                        endDay: _endDay,
-                        repeatWeekdays: _selectedWeekdays,
-                      ));
-                      repeatingEvents[0].printNewClass();
-                      Navigator.pop(context);
+                      setState(() {
+                        if (titleTextController.text.isEmpty) {
+                          validateTitle = true;
+                        } else {
+                          validateTitle = false;
+
+                          repeatingEvents.add(RepeatableEvent(
+                            title: titleTextController.text,
+                            startDay: _startDay,
+                            endDay: _endDay,
+                            repeatWeekdays: _selectedWeekdays,
+                          ));
+
+                          Navigator.pop(context);
+                        }
+                      });
                     },
                   ),
                 ],

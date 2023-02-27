@@ -377,11 +377,7 @@ class _CalendarEventsState extends State<CalendarEvents> {
                 },
               );
             },
-          ).then((value) => {
-                setState(
-                  () {},
-                )
-              });
+          ).then((value) => {setState(() {})});
         },
         backgroundColor: Colors.white,
         tooltip: 'ADD EVENT',
