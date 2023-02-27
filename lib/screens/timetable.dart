@@ -209,7 +209,7 @@ class _MyWidgetState extends State<MyWidget> with TickerProviderStateMixin {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: const [
                             Text(
-                              '반복 학습', //TODO: 이름 어떻게 컨트롤할지 생각
+                              '반복 학습',
                               style: TextStyle(
                                 color: Colors.blue,
                                 fontSize: 15,

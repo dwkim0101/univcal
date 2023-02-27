@@ -1,44 +1,51 @@
-// Copyright 2019 Aleksander Woźniak
 // SPDX-License-Identifier: Apache-2.0
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 
 import '../utils.dart';
 
 class StudyReminderView extends StatefulWidget {
   const StudyReminderView({super.key});
-
   @override
   State<StudyReminderView> createState() => _StudyReminderViewState();
 }
 
-class _StudyReminderViewState extends State<StudyReminderView>
-    with TickerProviderStateMixin {
-  List<int> currentReviewDays = [60, 28, 14, 7, 3, 1];
-  List<TextEditingController> _text = [];
-  List<bool> _validate = List.filled(6, false, growable: true);
-  int _trueLength = 0;
+class _StudyReminderViewState extends State<StudyReminderView> {
+  final box = Hive.box('mybox');
+  List<int> currentReviewDays = [];
+  List<TextEditingController> text = [];
+  List<bool> validate = List.filled(6, false, growable: true);
+  int trueLength = 0;
 
-  late final ValueNotifier<List<Event>> _selectedEvents;
-  final DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay;
+  late final ValueNotifier<List<Event>> selectedEvents;
+  final DateTime focusedDay = DateTime.now();
+  DateTime? selectedDay;
 
   @override
   void initState() {
     super.initState();
-    for (int i = 0; i < currentReviewDays.length; i++) {
-      _text.add(TextEditingController());
+    currentReviewDays =
+        box.get('currentReviewDays', defaultValue: [60, 28, 7, 5, 3, 1]);
+    // if (currentReviewDays.isEmpty) {
+    //   currentReviewDays = [60, 28, 7, 5, 3, 1];
+    // }
+    // print(currentReviewDays);
+    for (int i = 0; i < 6; i++) {
+      text.add(TextEditingController());
     }
-    _selectedDay = _focusedDay;
-    _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
+    selectedDay = focusedDay;
+    selectedEvents = ValueNotifier(_getEventsForDay(selectedDay!));
   }
 
   @override
   void dispose() {
-    _selectedEvents.dispose();
+    selectedEvents.dispose();
+    box.put('currentReviewDays', currentReviewDays);
+    // print('disposed!');
     super.dispose();
   }
 
@@ -53,7 +60,7 @@ class _StudyReminderViewState extends State<StudyReminderView>
       child: Column(
         children: [
           const SizedBox(height: 10),
-          _getEventsForDay(_selectedDay!.add(Duration(days: dayVariable)))
+          _getEventsForDay(selectedDay!.add(Duration(days: dayVariable)))
                   .isEmpty
               ? const SizedBox(height: 0)
               : Container(
@@ -70,7 +77,7 @@ class _StudyReminderViewState extends State<StudyReminderView>
                 ),
           Expanded(
             child: _getEventsForDay(
-                        _selectedDay!.add(Duration(days: dayVariable)))
+                        selectedDay!.add(Duration(days: dayVariable)))
                     .isEmpty
                 ? Column(
                     children: [
@@ -108,7 +115,7 @@ class _StudyReminderViewState extends State<StudyReminderView>
                   )
                 : ValueListenableBuilder<List<Event>>(
                     valueListenable: ValueNotifier(_getEventsForDay(
-                        _selectedDay!.add(Duration(days: dayVariable)))),
+                        selectedDay!.add(Duration(days: dayVariable)))),
                     builder: (context, value, _) {
                       return ListView.builder(
                         padding: const EdgeInsets.symmetric(horizontal: 7),
@@ -207,7 +214,7 @@ class _StudyReminderViewState extends State<StudyReminderView>
                   onPressed: () {
                     int currentReviewDaysLength = currentReviewDays.length;
                     for (int i = 0; i < currentReviewDaysLength; i++) {
-                      _validate[i] = false;
+                      validate[i] = false;
                     }
                     showModalBottomSheet(
                         shape: const RoundedRectangleBorder(
@@ -318,7 +325,7 @@ class _StudyReminderViewState extends State<StudyReminderView>
                                                         height: 50,
                                                         child: TextField(
                                                           controller:
-                                                              _text[index],
+                                                              text[index],
                                                           keyboardType:
                                                               TextInputType
                                                                   .number,
@@ -332,7 +339,7 @@ class _StudyReminderViewState extends State<StudyReminderView>
                                                           decoration:
                                                               InputDecoration(
                                                             errorText:
-                                                                _validate[index]
+                                                                validate[index]
                                                                     ? '값 입력'
                                                                     : null,
                                                             hintText: (currentReviewDays
@@ -369,34 +376,34 @@ class _StudyReminderViewState extends State<StudyReminderView>
                                         child: const Text('저장'),
                                         onPressed: () {
                                           setState(() {
-                                            _trueLength = 0;
+                                            trueLength = 0;
                                             for (int i = 0;
                                                 i < currentReviewDaysLength;
                                                 i++) {
-                                              if (_text[i].text.isEmpty) {
-                                                _validate[i] = true;
+                                              if (text[i].text.isEmpty) {
+                                                validate[i] = true;
                                               } else {
-                                                _validate[i] = false;
-                                                _trueLength += 1;
+                                                validate[i] = false;
+                                                trueLength += 1;
                                               }
                                             }
                                             if (currentReviewDaysLength ==
-                                                _trueLength) {
+                                                trueLength) {
                                               currentReviewDays = [];
                                               for (int i = 0;
                                                   i < currentReviewDaysLength;
                                                   i++) {
                                                 currentReviewDays.add(
-                                                    int.parse(_text[i].text));
+                                                    int.parse(text[i].text));
                                                 currentReviewDays.sort(
                                                     (b, a) => a.compareTo(b));
                                               }
-                                              _text = [];
+                                              text = [];
                                               for (int i = 0; i < 6; i++) {
-                                                _text.add(
+                                                text.add(
                                                     TextEditingController());
                                               }
-                                              _validate = List.filled(6, false);
+                                              validate = List.filled(6, false);
                                               super.setState(() {
                                                 Navigator.pop(context);
                                               });

@@ -31,10 +31,7 @@ class _CalendarEventsState extends State<CalendarEvents> {
   @override
   void initState() {
     super.initState();
-
     _selectedDay = _focusedDay;
-    textController.text =
-        DateFormat('yyyy/MM/dd').format(_selectedDay ?? DateTime.now());
     _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
   }
 
@@ -70,25 +67,6 @@ class _CalendarEventsState extends State<CalendarEvents> {
       _selectedEvents.value = _getEventsForDay(selectedDay);
       textController.text =
           DateFormat('yyyy/MM/dd').format(_selectedDay ?? DateTime.now());
-    }
-  }
-
-  void _onRangeSelected(DateTime? start, DateTime? end, DateTime focusedDay) {
-    setState(() {
-      _selectedDay = null;
-      _focusedDay = focusedDay;
-      _rangeStart = start;
-      _rangeEnd = end;
-      _rangeSelectionMode = RangeSelectionMode.toggledOn;
-    });
-
-    // `start` or `end` could be null
-    if (start != null && end != null) {
-      _selectedEvents.value = _getEventsForRange(start, end);
-    } else if (start != null) {
-      _selectedEvents.value = _getEventsForDay(start);
-    } else if (end != null) {
-      _selectedEvents.value = _getEventsForDay(end);
     }
   }
 
@@ -152,7 +130,6 @@ class _CalendarEventsState extends State<CalendarEvents> {
                 outsideDaysVisible: false,
               ),
               onDaySelected: _onDaySelected,
-              onRangeSelected: _onRangeSelected,
               onFormatChanged: (format) {
                 if (_calendarFormat != format) {
                   setState(() {
@@ -252,7 +229,7 @@ class _CalendarEventsState extends State<CalendarEvents> {
                                             width: 1.5, color: Colors.white)),
                                   ),
                                   child: ListTile(
-                                    enableFeedback: true,
+                                    // enableFeedback: true,
                                     // selectedTileColor: Colors.blueAccent,
                                     trailing: value[index].checkState
                                         ? const Icon(
@@ -276,7 +253,7 @@ class _CalendarEventsState extends State<CalendarEvents> {
                                         color: value[index].checkState
                                             ? Colors.white.withOpacity(0.6)
                                             : Colors.white,
-                                        fontSize: 14,
+                                        fontSize: 16,
                                         fontWeight: value[index].checkState
                                             ? FontWeight.w700
                                             : FontWeight.w700,
@@ -336,9 +313,9 @@ class _CalendarEventsState extends State<CalendarEvents> {
                             child: Transform.translate(
                               offset: const Offset(0, 15),
                               child: const Text(
-                                '강의 추가',
+                                '일일 강의 추가',
                                 style: TextStyle(
-                                    fontSize: 35,
+                                    fontSize: 30,
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold),
                               ),
@@ -413,6 +390,19 @@ class _CalendarEventsState extends State<CalendarEvents> {
 
   Future _selectDate(BuildContext context) async {
     final DateTime? selected = await showDatePicker(
+      builder: (BuildContext context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            dialogTheme: DialogTheme(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(
+                    20.0), // this is the border radius of the picker
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
       context: context,
       initialDate: _selectedDay ?? DateTime.now(),
       firstDate: DateTime(2000),

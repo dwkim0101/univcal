@@ -26,8 +26,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       icon: Icon(CupertinoIcons.text_badge_checkmark),
     ),
     Tab(
-      text: '정보',
-      icon: Icon(CupertinoIcons.info_circle),
+      text: '설정',
+      icon: Icon(CupertinoIcons.gear),
     ),
   ];
 

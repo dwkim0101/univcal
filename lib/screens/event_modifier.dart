@@ -1,10 +1,12 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
+import 'package:univcal/utils.dart';
 
 class EventAddScreen extends StatefulWidget {
   const EventAddScreen({super.key});
@@ -14,6 +16,7 @@ class EventAddScreen extends StatefulWidget {
 }
 
 class EventAddScreenState extends State<EventAddScreen> {
+  final box = Hive.box('mybox');
   // ignore: prefer_final_fields
   List<bool> _selectedWeekdays = <bool>[
     false,
@@ -34,12 +37,13 @@ class EventAddScreenState extends State<EventAddScreen> {
     const Text('토'),
     const Text('일')
   ];
+  final titleTextController = TextEditingController();
   final textController = TextEditingController();
   String _selectedDate = '';
   String _dateCount = '';
   String _range = '2023/01/01 ~ 2023/12/31';
   String _rangeCount = '';
-  late DateTime _startDay, _endDay;
+  DateTime _startDay = DateTime(2023, 01, 01), _endDay = DateTime(2023, 12, 31);
 
   void _onSelectionChanged(DateRangePickerSelectionChangedArgs args) {
     setState(() {
@@ -61,8 +65,21 @@ class EventAddScreenState extends State<EventAddScreen> {
   @override
   void initState() {
     textController.text = _range;
-
+    repeatingEvents =
+        box.get('repeatingEvents', defaultValue: <RepeatableEvent>[]);
+    for (RepeatableEvent _ in repeatingEvents) {
+      _.printNewClass();
+    }
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    box.put('repeatingEvents', repeatingEvents);
+    for (RepeatableEvent _ in repeatingEvents) {
+      _.printNewClass();
+    }
+    super.dispose();
   }
 
   @override
@@ -80,7 +97,7 @@ class EventAddScreenState extends State<EventAddScreen> {
             child: Transform.translate(
               offset: const Offset(0, 25),
               child: const Text(
-                '강의 추가',
+                '반복 강의 추가',
                 style: TextStyle(
                     fontSize: 35,
                     color: Colors.white,
@@ -94,8 +111,9 @@ class EventAddScreenState extends State<EventAddScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const TextField(
-                decoration: InputDecoration(hintText: '제목'),
+              TextField(
+                controller: titleTextController,
+                decoration: const InputDecoration(hintText: '제목'),
               ),
               const SizedBox(height: 15),
               const Text(
@@ -177,6 +195,13 @@ class EventAddScreenState extends State<EventAddScreen> {
                   ElevatedButton(
                     child: const Text('저장'),
                     onPressed: () {
+                      repeatingEvents.add(RepeatableEvent(
+                        title: titleTextController.text,
+                        startDay: _startDay,
+                        endDay: _endDay,
+                        repeatWeekdays: _selectedWeekdays,
+                      ));
+                      repeatingEvents[0].printNewClass();
                       Navigator.pop(context);
                     },
                   ),
