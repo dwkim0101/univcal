@@ -18,6 +18,7 @@ class CalendarEvents extends StatefulWidget {
 
 class _CalendarEventsState extends State<CalendarEvents> {
   final textController = TextEditingController();
+  DateTime? _currentDay;
   late final ValueNotifier<List<Event>> _selectedEvents;
   CalendarFormat _calendarFormat = CalendarFormat.month;
   RangeSelectionMode _rangeSelectionMode = RangeSelectionMode
@@ -67,6 +68,7 @@ class _CalendarEventsState extends State<CalendarEvents> {
       _selectedEvents.value = _getEventsForDay(selectedDay);
       textController.text =
           DateFormat('yyyy/MM/dd').format(_selectedDay ?? DateTime.now());
+      _currentDay = selectedDay;
     }
   }
 
@@ -277,9 +279,9 @@ class _CalendarEventsState extends State<CalendarEvents> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => {
+        onPressed: () {
           textController.text =
-              DateFormat('yyyy/MM/dd').format(_selectedDay ?? DateTime.now()),
+              DateFormat('yyyy/MM/dd').format(_selectedDay ?? DateTime.now());
           showModalBottomSheet(
             shape: const RoundedRectangleBorder(
                 borderRadius:
@@ -343,7 +345,7 @@ class _CalendarEventsState extends State<CalendarEvents> {
                                 showCursor: false,
                                 onTap: () => _selectDate(context),
                               ),
-                              const SizedBox(height: 15),
+                              const SizedBox(height: 35),
                               ButtonBar(
                                 children: <Widget>[
                                   ElevatedButton(
@@ -355,6 +357,9 @@ class _CalendarEventsState extends State<CalendarEvents> {
                                   ElevatedButton(
                                     child: const Text('저장'),
                                     onPressed: () {
+                                      kEvents[DateTime(2023, 2, 27)]?.add(Event(
+                                          textController.text)); //이러면 안들어간다잉
+
                                       Navigator.pop(context);
                                     },
                                   ),
@@ -363,12 +368,8 @@ class _CalendarEventsState extends State<CalendarEvents> {
                             ],
                           ),
                         ),
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.grey,
-                            ),
-                          ),
+                        const SizedBox(
+                          height: 35,
                         )
                       ],
                     ),
@@ -376,7 +377,11 @@ class _CalendarEventsState extends State<CalendarEvents> {
                 },
               );
             },
-          ),
+          ).then((value) => {
+                setState(
+                  () {},
+                )
+              });
         },
         backgroundColor: Colors.white,
         tooltip: 'ADD EVENT',
@@ -410,6 +415,7 @@ class _CalendarEventsState extends State<CalendarEvents> {
     );
     if (selected != null) {
       setState(() {
+        _currentDay = selected;
         textController.text = DateFormat('yyyy/MM/dd').format(selected);
       });
     }
