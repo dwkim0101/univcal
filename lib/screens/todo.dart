@@ -38,7 +38,7 @@ class _StudyReminderViewState extends State<StudyReminderView> {
     for (int i = 0; i < 6; i++) {
       text.add(TextEditingController());
     }
-    kEvents = box.get('kEvents', defaultValue: <DateTime, List<Event>>{});
+
     selectedDay = focusedDay;
     selectedEvents = ValueNotifier(_getEventsForDay(selectedDay!));
   }

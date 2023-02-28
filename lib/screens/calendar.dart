@@ -39,7 +39,6 @@ class _CalendarEventsState extends State<CalendarEvents> {
   void initState() {
     super.initState();
 
-    kEvents = box.get('kEvents', defaultValue: <DateTime, List<Event>>{});
     _selectedDay = _focusedDay;
     _currentDay = _selectedDay;
     _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
@@ -48,7 +47,7 @@ class _CalendarEventsState extends State<CalendarEvents> {
   @override
   void dispose() {
     _selectedEvents.dispose();
-
+    box.put('dailyEvents', dailyEvents);
     box.put('kEvents', kEvents);
     super.dispose();
   }
@@ -401,6 +400,9 @@ class _CalendarEventsState extends State<CalendarEvents> {
                                                   titleTextController
                                                       .text)); //이러면 안들어간다잉
                                             }
+                                            dailyEvents.add(NonRepeatableEvent(
+                                                titleTextController.text,
+                                                _currentDay!));
                                             Navigator.pop(context);
                                           }
                                         },

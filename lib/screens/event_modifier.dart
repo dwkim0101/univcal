@@ -57,8 +57,6 @@ class EventAddScreenState extends State<EventAddScreen> {
   @override
   void initState() {
     textController.text = _range;
-    repeatingEvents = box.get('repeatingEvents',
-        defaultValue: <RepeatableEvent>[]).cast<RepeatableEvent>();
     // for (RepeatableEvent _ in repeatingEvents) {
     //   _.printNewClass();
     // }

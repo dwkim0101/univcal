@@ -1,9 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:univcal/screens/calendar.dart';
 import 'package:univcal/screens/timetable.dart';
-import 'package:univcal/screens/info.dart';
+import 'package:univcal/screens/editing.dart';
 import 'package:univcal/screens/todo.dart';
+
+import '../utils.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -12,6 +15,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
+  final box = Hive.box('mybox');
   static const List<Tab> myTabs = <Tab>[
     Tab(
       text: '시간표',
@@ -35,6 +39,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
   @override
   void initState() {
+    repeatingEvents = box.get('repeatingEvents').cast<RepeatableEvent>();
+    dailyEvents = box.get('dailyEvents',
+        defaultValue: <NonRepeatableEvent>[]).cast<NonRepeatableEvent>();
+    kEventUpdate();
     super.initState();
     _tabController = TabController(vsync: this, length: myTabs.length);
   }
@@ -71,7 +79,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             MyWidget(),
             CalendarEvents(),
             StudyReminderView(),
-            InfoPage(),
+            EditPage(),
           ],
           // myTabs.map((Tab tab) {
           //   return Center(

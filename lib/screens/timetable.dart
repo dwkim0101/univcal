@@ -39,16 +39,30 @@ class _MyWidgetState extends State<MyWidget> with TickerProviderStateMixin {
   @override
   void dispose() {
     controller.dispose();
+
+    box.put('kEvents', kEvents);
+    box.put('repeatingEvents', repeatingEvents);
     super.dispose();
   }
 
   @override
   void initState() {
-    repeatingEvents = box.get('repeatingEvents',
-        defaultValue: <RepeatableEvent>[]).cast<RepeatableEvent>();
+    box.delete('kEvents');
+    // box.delete('repeatingEvents');
+    // box.delete('dailyEvents');
+    // kEvents = LinkedHashMap<DateTime, List<Event>>.from(
+    //     box.get('kEvents', defaultValue: <DateTime, List<Event>>{}));
+
+    // repeatingEvents = box.get('repeatingEvents',
+    // //     defaultValue: <RepeatableEvent>[]).cast<RepeatableEvent>();
+    // kEvents = box.get('kEvents').cast<DateTime, List<Event>>();
+
     for (RepeatableEvent _ in repeatingEvents) {
       for (int i = 0; i < 7; i++) {
         if (_.repeatWeekdays[i]) {
+          // &&
+          // getHashCode(_.startDay) <= getHashCode(DateTime.now()) &&
+          // getHashCode(DateTime.now()) <= getHashCode(_.endDay)
           repeatingEventsNumberList[i]++; //사실 필요 없긴 한데
           repeatingEventsTitleList[i].add(_.title);
           repeatingEventsStartDaysList[i].add(_.startDay);
@@ -129,27 +143,35 @@ class _MyWidgetState extends State<MyWidget> with TickerProviderStateMixin {
                         ).then((value) => {
                               setState(() {
                                 if (currentLength != repeatingEvents.length) {
+                                  var _ = repeatingEvents[
+                                      repeatingEvents.length - 1];
                                   for (int i = 0; i < 7; i++) {
-                                    if (repeatingEvents[
-                                            repeatingEvents.length - 1]
-                                        .repeatWeekdays[i]) {
+                                    if (_.repeatWeekdays[i]) {
                                       repeatingEventsNumberList[
                                           i]++; //사실 필요 없긴 한데
-                                      repeatingEventsTitleList[i].add(
-                                          repeatingEvents[
-                                                  repeatingEvents.length - 1]
-                                              .title);
-                                      repeatingEventsStartDaysList[i].add(
-                                          repeatingEvents[
-                                                  repeatingEvents.length - 1]
-                                              .startDay);
-                                      repeatingEventsEndDaysList[i].add(
-                                          repeatingEvents[
-                                                  repeatingEvents.length - 1]
-                                              .endDay);
+                                      repeatingEventsTitleList[i].add(_.title);
+                                      repeatingEventsStartDaysList[i]
+                                          .add(_.startDay);
+                                      repeatingEventsEndDaysList[i]
+                                          .add(_.endDay);
                                     }
                                   }
                                   currentLength = repeatingEvents.length;
+                                  //반복 이벤트 생성
+                                  for (DateTime currentDay
+                                      in daysInRange(_.startDay, _.endDay)) {
+                                    if (_.repeatWeekdays[
+                                        currentDay.weekday - 1]) {
+                                      if (kEvents[currentDay] == null) {
+                                        kEvents.addAll({
+                                          currentDay: [Event(_.title)]
+                                        });
+                                      } else {
+                                        kEvents[currentDay]
+                                            ?.add(Event(_.title));
+                                      }
+                                    }
+                                  }
                                 }
                               })
                             }),
@@ -233,13 +255,13 @@ class _MyWidgetState extends State<MyWidget> with TickerProviderStateMixin {
                                 subtitle: Text(
                                     '${DateFormat('yy/MM/dd').format(repeatingEventsStartDaysList[index][i])} ~'
                                     ' ${DateFormat('yy/MM/dd').format(repeatingEventsEndDaysList[index][i])}'),
-                                trailing: const Icon(
-                                  CupertinoIcons.circle,
-                                  // color: Colors.blue,
-                                ),
-                                onTap: () {
-                                  //TODO:ONTAP GUHYUN
-                                },
+                                // trailing: const Icon(
+                                //   CupertinoIcons.circle,
+                                //   // color: Colors.blue,
+                                // ),
+                                // onTap: () {
+                                //   //TODO:ONTAP GUHYUN
+                                // },
                               ),
                             ),
                           );
