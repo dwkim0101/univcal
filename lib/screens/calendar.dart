@@ -29,7 +29,7 @@ class _CalendarEventsState extends State<CalendarEvents> {
       .toggledOff; // Can be toggled on/off by longpressing a date
   DateTime _focusedDay = DateTime.utc(
       DateTime.now().year, DateTime.now().month, DateTime.now().day);
-  final box = Hive.box('mybox');
+  final box = Hive.box('mybox2');
   DateTime? _selectedDay;
   DateTime? _rangeStart;
   DateTime? _rangeEnd;
@@ -38,7 +38,6 @@ class _CalendarEventsState extends State<CalendarEvents> {
   @override
   void initState() {
     super.initState();
-
     _selectedDay = _focusedDay;
     _currentDay = _selectedDay;
     _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
@@ -47,16 +46,17 @@ class _CalendarEventsState extends State<CalendarEvents> {
   @override
   void dispose() {
     _selectedEvents.dispose();
+    box.put('repeatingEvents', repeatingEvents);
     box.put('dailyEvents', dailyEvents);
-    box.put('kEvents', kEvents);
+    box.put('convertedRepeatingEvents', convertedRepeatingEvents);
     super.dispose();
   }
 
   List<Event> _getEventsForDay(DateTime day) {
+    // kEventUpdate();
+
     // print(day);
     // print(kEvents[day]);
-    // print(day);
-    // Implementation example
     return kEvents[day] ?? [];
   }
 
@@ -262,6 +262,24 @@ class _CalendarEventsState extends State<CalendarEvents> {
                                       setState(() {
                                         value[index].checkState =
                                             !(value[index].checkState);
+                                        if (value[index].repeatable) {
+                                          for (var _
+                                              in convertedRepeatingEvents) {
+                                            //인덱스를 확실하게 알기 어려운게, 소팅을 해버리면,,,
+                                            if (_.index == value[index].index) {
+                                              _.checkState = !_.checkState;
+                                              break;
+                                            }
+                                          }
+                                        } else {
+                                          for (var _ in dailyEvents) {
+                                            //인덱스를 확실하게 알기 어려운게, 소팅을 해버리면,,,
+                                            if (_.index == value[index].index) {
+                                              _.checkState = !_.checkState;
+                                              break;
+                                            }
+                                          }
+                                        }
                                       })
                                     },
                                     title: Text(
@@ -392,17 +410,29 @@ class _CalendarEventsState extends State<CalendarEvents> {
                                               kEvents.addAll({
                                                 _currentDay!: [
                                                   Event(
-                                                      titleTextController.text)
+                                                    title: titleTextController
+                                                        .text,
+                                                    checkState: false,
+                                                    repeatable: false,
+                                                    reviewState: {},
+                                                    index: dailyEvents.length,
+                                                  )
                                                 ]
                                               });
                                             } else {
                                               kEvents[_currentDay]!.add(Event(
-                                                  titleTextController
-                                                      .text)); //이러면 안들어간다잉
+                                                title: titleTextController.text,
+                                                checkState: false,
+                                                repeatable: false,
+                                                reviewState: {},
+                                                index: dailyEvents.length,
+                                              )); //이러면 안들어간다잉
                                             }
                                             dailyEvents.add(NonRepeatableEvent(
-                                                titleTextController.text,
-                                                _currentDay!));
+                                              title: titleTextController.text,
+                                              date: _currentDay!,
+                                              index: dailyEvents.length,
+                                            ));
                                             Navigator.pop(context);
                                           }
                                         },
@@ -465,6 +495,7 @@ class _CalendarEventsState extends State<CalendarEvents> {
 }
 
 bool isEventEmpty(DateTime day) {
+  // print(kEvents[day]);
   if (kEvents[day] == null) {
     return true;
   } else if (kEvents[day]!.isEmpty) {

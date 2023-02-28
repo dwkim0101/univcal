@@ -12,19 +12,20 @@ class EditPage extends StatefulWidget {
 }
 
 class _EditPageState extends State<EditPage> {
-  final box = Hive.box('mybox');
+  final box = Hive.box('mybox2');
 
   @override
   void initState() {
-    print(dailyEvents);
+    repeatingEvents.sort(((a, b) => a.startDay.compareTo(b.startDay)));
+    dailyEvents.sort(((a, b) => a.date.compareTo(b.date)));
     super.initState();
   }
 
   @override
   void dispose() {
-    box.put('kEvents', kEvents);
     box.put('repeatingEvents', repeatingEvents);
     box.put('dailyEvents', dailyEvents);
+    box.put('convertedRepeatingEvents', convertedRepeatingEvents);
     super.dispose();
   }
 
@@ -76,7 +77,7 @@ class _EditPageState extends State<EditPage> {
                               height: 4,
                             ),
                             Text(
-                              '수정 및 삭제',
+                              '강의 삭제',
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 25,
@@ -99,6 +100,9 @@ class _EditPageState extends State<EditPage> {
                   '반복 학습',
                   // style: TextStyle(fontSize: 16),
                 ),
+                const SizedBox(
+                  height: 5,
+                ),
                 Expanded(
                   flex: 4,
                   child: repeatingEvents.isEmpty
@@ -119,6 +123,8 @@ class _EditPageState extends State<EditPage> {
                               return Padding(
                                 padding: const EdgeInsets.all(0),
                                 child: Container(
+                                  padding:
+                                      const EdgeInsets.only(top: 5, bottom: 10),
                                   margin: const EdgeInsets.symmetric(
                                       horizontal: 15),
                                   decoration: BoxDecoration(
@@ -140,9 +146,13 @@ class _EditPageState extends State<EditPage> {
                                       ),
                                     ),
                                     subtitle: Text(
-                                        '${DateFormat('yy/MM/dd').format(repeatingEvents[index].startDay)} ~'
+                                        '[${makeWeekDaysString(repeatingEvents[index].repeatWeekdays)}]'
+                                        '\n${DateFormat('yy/MM/dd').format(repeatingEvents[index].startDay)} ~'
                                         ' ${DateFormat('yy/MM/dd').format(repeatingEvents[index].endDay)}'),
-                                    onTap: () {},
+                                    onTap: () {
+                                      flutterDialog(context, true, index);
+                                      setState(() {});
+                                    },
                                   ),
                                 ),
                               );
@@ -160,19 +170,18 @@ class _EditPageState extends State<EditPage> {
                 Expanded(
                   flex: 4,
                   child: dailyEvents.isEmpty
-                      ? Container(
-                          // decoration: BoxDecoration(border: Border.all()),
-                          child: const Center(
-                            child: Text(
-                              '당일 학습이 존재하지 않습니다',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
+                      ? const Center(
+                          child: Text(
+                            '당일 학습이 존재하지 않습니다',
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         )
                       : Padding(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 0, vertical: 0),
                           child: ListView.builder(
+                            padding: const EdgeInsets.only(top: 5, bottom: 10),
+                            key: ValueKey(dailyEvents.length),
                             // physics: const ScrollPhysics(),
                             scrollDirection: Axis.vertical,
                             itemCount: dailyEvents.length,
@@ -202,7 +211,11 @@ class _EditPageState extends State<EditPage> {
                                     ),
                                     subtitle: Text(DateFormat('yyyy/MM/dd')
                                         .format(dailyEvents[index].date)),
-                                    onTap: () {},
+                                    onTap: () {
+                                      setState(() {
+                                        flutterDialog(context, false, index);
+                                      });
+                                    },
                                   ),
                                 ),
                               );
@@ -217,4 +230,62 @@ class _EditPageState extends State<EditPage> {
       ),
     );
   }
+}
+
+void flutterDialog(BuildContext context, bool isRepeatAble, int index) {
+  showDialog(
+      context: context,
+      //barrierDismissible - Dialog를 제외한 다른 화면 터치 x
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          // RoundedRectangleBorder - Dialog 화면 모서리 둥글게 조절
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
+          //Dialog Main Title
+          title: Column(
+            children: const <Widget>[
+              Text("정말로 삭제하시겠습니까?"),
+            ],
+          ),
+          //
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              ButtonBar(
+                children: [
+                  ElevatedButton(
+                    child: const Text("취소"),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  ElevatedButton(
+                    child: const Text("확인"),
+                    onPressed: () {
+                      if (isRepeatAble) {
+                        for (var i = 0;
+                            i < convertedRepeatingEvents.length;
+                            i++) {
+                          if (repeatingEvents[index].index ==
+                              convertedRepeatingEvents[i].parentIndex) {
+                            convertedRepeatingEvents.removeAt(i);
+                            i--;
+                          }
+                        }
+                        repeatingEvents.removeAt(index);
+                      } else {
+                        dailyEvents.removeAt(index);
+                      }
+                      kEventUpdate();
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              )
+            ],
+          ),
+        );
+      });
 }

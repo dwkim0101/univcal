@@ -9,12 +9,16 @@ void main() async {
   Hive.registerAdapter(NonRepeatableEventAdapter());
   Hive.registerAdapter(EventAdapter());
   await Hive.initFlutter();
-  await Hive.openBox('myBox');
+  await Hive.openBox('myBox2');
 
   // final box = Hive.openBox('mybox');
 
   runApp(const MyApp());
 }
+
+//TODO: LANDINGPAGE / MODIFY EVENT /
+//TODO: UPDATE SCREEN ERROR IN CALENDAR ADD + NO EVENTS / ERASE
+//TODO: 학.복습 날짜 바꾸어먹기
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

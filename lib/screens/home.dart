@@ -15,7 +15,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
-  final box = Hive.box('mybox');
+  final box = Hive.box('mybox2');
   static const List<Tab> myTabs = <Tab>[
     Tab(
       text: '시간표',
@@ -36,13 +36,26 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   ];
 
   late TabController _tabController;
-
   @override
   void initState() {
-    repeatingEvents = box.get('repeatingEvents').cast<RepeatableEvent>();
+    // box.delete('kEvents');
+    // box.delete('convertedRepeatingEvents');
+    // box.delete('repeatingEvents');
+    // box.delete('dailyEvents');
+    // repeatingEvents = [];
+    // convertedRepeatingEvents = [];
+    // dailyEvents = [];
+
+    repeatingEvents = box.get('repeatingEvents',
+        defaultValue: <RepeatableEvent>[]).cast<RepeatableEvent>();
     dailyEvents = box.get('dailyEvents',
         defaultValue: <NonRepeatableEvent>[]).cast<NonRepeatableEvent>();
+    convertedRepeatingEvents = box.get('convertedRepeatingEvents',
+        defaultValue: <NonRepeatableEvent>[]).cast<NonRepeatableEvent>();
+
     kEventUpdate();
+    // kEvents = LinkedHashMap<DateTime, List<Event>>.from(
+    // tempMap<DateTime, List<Event>>)
     super.initState();
     _tabController = TabController(vsync: this, length: myTabs.length);
   }
@@ -50,6 +63,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   @override
   void dispose() {
     _tabController.dispose();
+
+    box.put('repeatingEvents', repeatingEvents);
+    box.put('dailyEvents', dailyEvents);
+    box.put('convertedRepeatingEvents', convertedRepeatingEvents);
     super.dispose();
   }
 

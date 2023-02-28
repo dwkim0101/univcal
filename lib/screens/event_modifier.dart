@@ -16,7 +16,7 @@ class EventAddScreen extends StatefulWidget {
 }
 
 class EventAddScreenState extends State<EventAddScreen> {
-  final box = Hive.box('mybox');
+  final box = Hive.box('mybox2');
   // ignore: prefer_final_fields
   List<bool> _selectedWeekdays = List.filled(7, false);
   bool validateTitle = false;
@@ -66,6 +66,8 @@ class EventAddScreenState extends State<EventAddScreen> {
   @override
   void dispose() {
     box.put('repeatingEvents', repeatingEvents);
+    box.put('dailyEvents', dailyEvents);
+    box.put('convertedRepeatingEvents', convertedRepeatingEvents);
     // for (RepeatableEvent _ in repeatingEvents) {
     //   _.printNewClass();
     // }
@@ -196,6 +198,7 @@ class EventAddScreenState extends State<EventAddScreen> {
                           validateTitle = false;
 
                           repeatingEvents.add(RepeatableEvent(
+                            index: repeatingEvents.length,
                             title: titleTextController.text,
                             startDay: _startDay,
                             endDay: _endDay,

@@ -17,22 +17,28 @@ class EventAdapter extends TypeAdapter<Event> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Event(
-      fields[0] as String,
-    )
-      ..checkState = fields[1] as bool
-      ..reviewState = (fields[2] as Map).cast<DateTime, bool>();
+      title: fields[0] as String,
+      checkState: fields[1] as bool,
+      reviewState: (fields[2] as Map).cast<DateTime, bool>(),
+      repeatable: fields[3] as bool,
+      index: fields[4] as int,
+    );
   }
 
   @override
   void write(BinaryWriter writer, Event obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.title)
       ..writeByte(1)
       ..write(obj.checkState)
       ..writeByte(2)
-      ..write(obj.reviewState);
+      ..write(obj.reviewState)
+      ..writeByte(3)
+      ..write(obj.repeatable)
+      ..writeByte(4)
+      ..write(obj.index);
   }
 
   @override
@@ -61,13 +67,14 @@ class RepeatableEventAdapter extends TypeAdapter<RepeatableEvent> {
       startDay: fields[1] as DateTime,
       endDay: fields[2] as DateTime,
       repeatWeekdays: (fields[3] as List).cast<bool>(),
+      index: fields[4] as int,
     );
   }
 
   @override
   void write(BinaryWriter writer, RepeatableEvent obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.title)
       ..writeByte(1)
@@ -75,7 +82,9 @@ class RepeatableEventAdapter extends TypeAdapter<RepeatableEvent> {
       ..writeByte(2)
       ..write(obj.endDay)
       ..writeByte(3)
-      ..write(obj.repeatWeekdays);
+      ..write(obj.repeatWeekdays)
+      ..writeByte(4)
+      ..write(obj.index);
   }
 
   @override
@@ -100,19 +109,31 @@ class NonRepeatableEventAdapter extends TypeAdapter<NonRepeatableEvent> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return NonRepeatableEvent(
-      fields[0] as String,
-      fields[1] as DateTime,
-    );
+      title: fields[0] as String,
+      date: fields[1] as DateTime,
+      index: fields[4] as int,
+      parentIndex: fields[5] as int?,
+    )
+      ..checkState = fields[2] as bool
+      ..reviewState = (fields[3] as Map).cast<DateTime, bool>();
   }
 
   @override
   void write(BinaryWriter writer, NonRepeatableEvent obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.title)
       ..writeByte(1)
-      ..write(obj.date);
+      ..write(obj.date)
+      ..writeByte(2)
+      ..write(obj.checkState)
+      ..writeByte(3)
+      ..write(obj.reviewState)
+      ..writeByte(4)
+      ..write(obj.index)
+      ..writeByte(5)
+      ..write(obj.parentIndex);
   }
 
   @override

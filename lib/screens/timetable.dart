@@ -16,47 +16,41 @@ class MyWidget extends StatefulWidget {
 }
 
 class _MyWidgetState extends State<MyWidget> with TickerProviderStateMixin {
-  final box = Hive.box('mybox');
+  final box = Hive.box('mybox2');
   int currentLength = 0;
   List<int> repeatingEventsNumberList = List.generate(7, (_) => 0);
   List<List<String>> repeatingEventsTitleList = List.generate(7, (_) => []);
+  List<List<String>> repeatingEventsWeekDaysList = List.generate(7, (_) => []);
   List<List<DateTime>> repeatingEventsStartDaysList =
       List.generate(7, (_) => []);
   List<List<DateTime>> repeatingEventsEndDaysList = List.generate(7, (_) => []);
 
-  final List<String> dateNameList = ['월', '화', '수', '목', '금', '토', '일'];
-  final List<String> dateNameListEng = [
-    'MON',
-    'TUE',
-    'WED',
-    'THUR',
-    'FRI',
-    'SAT',
-    'SUN'
-  ];
   late AnimationController controller;
   final GlobalKey _paginationKey = GlobalKey();
   @override
   void dispose() {
     controller.dispose();
-
-    box.put('kEvents', kEvents);
     box.put('repeatingEvents', repeatingEvents);
+    box.put('dailyEvents', dailyEvents);
+    box.put('convertedRepeatingEvents', convertedRepeatingEvents);
     super.dispose();
   }
 
   @override
   void initState() {
-    box.delete('kEvents');
+    // box.delete('kEvents');
+    // box.delete('convertedRepeatingEvents');
     // box.delete('repeatingEvents');
     // box.delete('dailyEvents');
-    // kEvents = LinkedHashMap<DateTime, List<Event>>.from(
-    //     box.get('kEvents', defaultValue: <DateTime, List<Event>>{}));
-
+    // repeatingEvents = [];
+    // convertedRepeatingEvents = [];
+    // dailyEvents = [];
     // repeatingEvents = box.get('repeatingEvents',
-    // //     defaultValue: <RepeatableEvent>[]).cast<RepeatableEvent>();
-    // kEvents = box.get('kEvents').cast<DateTime, List<Event>>();
+    //     defaultValue: <RepeatableEvent>[]).cast<RepeatableEvent>();
+    // dailyEvents = box.get('dailyEvents',
+    //     defaultValue: <NonRepeatableEvent>[]).cast<NonRepeatableEvent>();
 
+    kEventUpdate();
     for (RepeatableEvent _ in repeatingEvents) {
       for (int i = 0; i < 7; i++) {
         if (_.repeatWeekdays[i]) {
@@ -65,6 +59,8 @@ class _MyWidgetState extends State<MyWidget> with TickerProviderStateMixin {
           // getHashCode(DateTime.now()) <= getHashCode(_.endDay)
           repeatingEventsNumberList[i]++; //사실 필요 없긴 한데
           repeatingEventsTitleList[i].add(_.title);
+          repeatingEventsWeekDaysList[i]
+              .add(makeWeekDaysString(_.repeatWeekdays));
           repeatingEventsStartDaysList[i].add(_.startDay);
           repeatingEventsEndDaysList[i].add(_.endDay);
         }
@@ -150,28 +146,32 @@ class _MyWidgetState extends State<MyWidget> with TickerProviderStateMixin {
                                       repeatingEventsNumberList[
                                           i]++; //사실 필요 없긴 한데
                                       repeatingEventsTitleList[i].add(_.title);
+
+                                      repeatingEventsWeekDaysList[i].add(
+                                          makeWeekDaysString(_.repeatWeekdays));
                                       repeatingEventsStartDaysList[i]
                                           .add(_.startDay);
                                       repeatingEventsEndDaysList[i]
                                           .add(_.endDay);
                                     }
                                   }
-                                  currentLength = repeatingEvents.length;
-                                  //반복 이벤트 생성
                                   for (DateTime currentDay
                                       in daysInRange(_.startDay, _.endDay)) {
                                     if (_.repeatWeekdays[
                                         currentDay.weekday - 1]) {
-                                      if (kEvents[currentDay] == null) {
-                                        kEvents.addAll({
-                                          currentDay: [Event(_.title)]
-                                        });
-                                      } else {
-                                        kEvents[currentDay]
-                                            ?.add(Event(_.title));
-                                      }
+                                      int tempIndex =
+                                          convertedRepeatingEvents.length;
+                                      convertedRepeatingEvents
+                                          .add(NonRepeatableEvent(
+                                        title: _.title,
+                                        date: currentDay,
+                                        index: tempIndex,
+                                        parentIndex: _.index,
+                                      ));
                                     }
                                   }
+                                  kEventUpdate();
+                                  currentLength = repeatingEvents.length;
                                 }
                               })
                             }),
@@ -233,6 +233,8 @@ class _MyWidgetState extends State<MyWidget> with TickerProviderStateMixin {
                           return Padding(
                             padding: const EdgeInsets.all(0),
                             child: Container(
+                              padding:
+                                  const EdgeInsets.only(top: 10, bottom: 15),
                               margin:
                                   const EdgeInsets.symmetric(horizontal: 15),
                               decoration: BoxDecoration(
@@ -253,7 +255,8 @@ class _MyWidgetState extends State<MyWidget> with TickerProviderStateMixin {
                                   ),
                                 ),
                                 subtitle: Text(
-                                    '${DateFormat('yy/MM/dd').format(repeatingEventsStartDaysList[index][i])} ~'
+                                    '[${repeatingEventsWeekDaysList[index][i]}]'
+                                    '\n${DateFormat('yy/MM/dd').format(repeatingEventsStartDaysList[index][i])} ~'
                                     ' ${DateFormat('yy/MM/dd').format(repeatingEventsEndDaysList[index][i])}'),
                                 // trailing: const Icon(
                                 //   CupertinoIcons.circle,

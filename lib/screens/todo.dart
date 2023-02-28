@@ -15,7 +15,7 @@ class StudyReminderView extends StatefulWidget {
 }
 
 class _StudyReminderViewState extends State<StudyReminderView> {
-  final box = Hive.box('mybox');
+  final box = Hive.box('mybox2');
   List<int> currentReviewDays = [];
   List<TextEditingController> text = [];
   List<bool> validate = List.filled(6, false, growable: true);
@@ -29,6 +29,7 @@ class _StudyReminderViewState extends State<StudyReminderView> {
   @override
   void initState() {
     super.initState();
+
     currentReviewDays =
         box.get('currentReviewDays', defaultValue: [60, 28, 7, 5, 3, 1]);
     // if (currentReviewDays.isEmpty) {
@@ -46,8 +47,11 @@ class _StudyReminderViewState extends State<StudyReminderView> {
   @override
   void dispose() {
     selectedEvents.dispose();
-    box.put('kEvents', kEvents);
+    // box.put('kEvents', kEvents);
     box.put('currentReviewDays', currentReviewDays);
+    box.put('repeatingEvents', repeatingEvents);
+    box.put('dailyEvents', dailyEvents);
+    box.put('convertedRepeatingEvents', convertedRepeatingEvents);
     // print('disposed!');
     super.dispose();
   }
@@ -134,7 +138,8 @@ class _StudyReminderViewState extends State<StudyReminderView> {
                               border: Border(bottom: BorderSide(width: 0.3)),
                             ),
                             child: ListTile(
-                              trailing: eventHandler(value, index) //TODO:
+                              trailing: eventHandler(value, index,
+                                      value[index].repeatable) //TODO:
                                   ? const Icon(
                                       CupertinoIcons.check_mark_circled_solid,
                                       color: Colors.blue,
@@ -142,26 +147,39 @@ class _StudyReminderViewState extends State<StudyReminderView> {
                                   : const Icon(CupertinoIcons.circle),
                               onTap: () => {
                                 setState(() {
-                                  value[index].reviewState[DateTime.utc(
-                                    DateTime.now().year,
-                                    DateTime.now().month,
-                                    DateTime.now().day,
-                                  )] = !(value[index].reviewState[DateTime.utc(
-                                    DateTime.now().year,
-                                    DateTime.now().month,
-                                    DateTime.now().day,
-                                  )]!);
+                                  DateTime temp = DateTime.utc(
+                                      DateTime.now().year,
+                                      DateTime.now().month,
+                                      DateTime.now().day);
+                                  int currentIndex = value[index].index;
+                                  value[index].reviewState[temp] =
+                                      !(value[index].reviewState[temp]!);
+                                  //TODO: 왜 되는지 모르겠지만 일단 됨...?
+
+                                  // if (value[index].repeatable) {
+                                  //   convertedRepeatingEvents[currentIndex]
+                                  //           .reviewState[temp] =
+                                  //       !convertedRepeatingEvents[currentIndex]
+                                  //           .reviewState[temp]!;
+                                  // } else {
+                                  //   dailyEvents[currentIndex]
+                                  //           .reviewState[temp] =
+                                  //       !dailyEvents[currentIndex]
+                                  //           .reviewState[temp]!;
+                                  // }
                                 })
                               },
                               title: Text(
                                 '${value[index]}',
                                 style: TextStyle(
-                                    color: eventHandler(value, index)
+                                    color: eventHandler(value, index,
+                                            value[index].repeatable)
                                         ? Colors.grey
                                         : Colors.black,
                                     fontSize: 18,
                                     fontWeight: FontWeight.w500,
-                                    decoration: eventHandler(value, index)
+                                    decoration: eventHandler(value, index,
+                                            value[index].repeatable)
                                         ? TextDecoration.lineThrough
                                         : TextDecoration.none),
                               ),
@@ -485,16 +503,20 @@ class _StudyReminderViewState extends State<StudyReminderView> {
   }
 }
 
-bool eventHandler(List<Event> value, int index) {
+bool eventHandler(List<Event> value, int index, bool isRepeatable) {
   // print(value);
-  if (value[index].reviewState[DateTime.utc(
-          DateTime.now().year, DateTime.now().month, DateTime.now().day)] ==
-      null) {
-    value[index].reviewState.addAll({
-      DateTime.utc(
-          DateTime.now().year, DateTime.now().month, DateTime.now().day): false
-    });
+  DateTime temp = DateTime.utc(
+      DateTime.now().year, DateTime.now().month, DateTime.now().day);
+  int currentIndex = value[index].index;
+  if (isRepeatable) {
+    if (convertedRepeatingEvents[currentIndex].reviewState[temp] == null) {
+      convertedRepeatingEvents[currentIndex].reviewState.addAll({temp: false});
+    }
+    return convertedRepeatingEvents[currentIndex].reviewState[temp]!;
+  } else {
+    if (dailyEvents[currentIndex].reviewState[temp] == null) {
+      dailyEvents[currentIndex].reviewState.addAll({temp: false});
+    }
+    return dailyEvents[currentIndex].reviewState[temp]!;
   }
-  return value[index].reviewState[DateTime.utc(
-      DateTime.now().year, DateTime.now().month, DateTime.now().day)]!;
 }
