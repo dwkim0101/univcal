@@ -22,7 +22,8 @@ class _StudyReminderViewState extends State<StudyReminderView> {
   int trueLength = 0;
 
   late final ValueNotifier<List<Event>> selectedEvents;
-  final DateTime focusedDay = DateTime.now();
+  final DateTime focusedDay = DateTime.utc(
+      DateTime.now().year, DateTime.now().month, DateTime.now().day);
   DateTime? selectedDay;
 
   @override
@@ -37,6 +38,7 @@ class _StudyReminderViewState extends State<StudyReminderView> {
     for (int i = 0; i < 6; i++) {
       text.add(TextEditingController());
     }
+    kEvents = box.get('kEvents', defaultValue: <DateTime, List<Event>>{});
     selectedDay = focusedDay;
     selectedEvents = ValueNotifier(_getEventsForDay(selectedDay!));
   }
@@ -44,6 +46,7 @@ class _StudyReminderViewState extends State<StudyReminderView> {
   @override
   void dispose() {
     selectedEvents.dispose();
+    box.put('kEvents', kEvents);
     box.put('currentReviewDays', currentReviewDays);
     // print('disposed!');
     super.dispose();
@@ -131,7 +134,7 @@ class _StudyReminderViewState extends State<StudyReminderView> {
                               border: Border(bottom: BorderSide(width: 0.3)),
                             ),
                             child: ListTile(
-                              trailing: value[index].checkState
+                              trailing: eventHandler(value, index) //TODO:
                                   ? const Icon(
                                       CupertinoIcons.check_mark_circled_solid,
                                       color: Colors.blue,
@@ -139,19 +142,26 @@ class _StudyReminderViewState extends State<StudyReminderView> {
                                   : const Icon(CupertinoIcons.circle),
                               onTap: () => {
                                 setState(() {
-                                  value[index].checkState =
-                                      !(value[index].checkState);
+                                  value[index].reviewState[DateTime.utc(
+                                    DateTime.now().year,
+                                    DateTime.now().month,
+                                    DateTime.now().day,
+                                  )] = !(value[index].reviewState[DateTime.utc(
+                                    DateTime.now().year,
+                                    DateTime.now().month,
+                                    DateTime.now().day,
+                                  )]!);
                                 })
                               },
                               title: Text(
                                 '${value[index]}',
                                 style: TextStyle(
-                                    color: value[index].checkState
+                                    color: eventHandler(value, index)
                                         ? Colors.grey
                                         : Colors.black,
                                     fontSize: 18,
                                     fontWeight: FontWeight.w500,
-                                    decoration: value[index].checkState
+                                    decoration: eventHandler(value, index)
                                         ? TextDecoration.lineThrough
                                         : TextDecoration.none),
                               ),
@@ -473,4 +483,18 @@ class _StudyReminderViewState extends State<StudyReminderView> {
       ]),
     );
   }
+}
+
+bool eventHandler(List<Event> value, int index) {
+  // print(value);
+  if (value[index].reviewState[DateTime.utc(
+          DateTime.now().year, DateTime.now().month, DateTime.now().day)] ==
+      null) {
+    value[index].reviewState.addAll({
+      DateTime.utc(
+          DateTime.now().year, DateTime.now().month, DateTime.now().day): false
+    });
+  }
+  return value[index].reviewState[DateTime.utc(
+      DateTime.now().year, DateTime.now().month, DateTime.now().day)]!;
 }

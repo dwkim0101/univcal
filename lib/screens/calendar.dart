@@ -4,6 +4,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -18,31 +19,44 @@ class CalendarEvents extends StatefulWidget {
 
 class _CalendarEventsState extends State<CalendarEvents> {
   final textController = TextEditingController();
+  final titleTextController = TextEditingController();
+  bool validateTitle = false;
+
   DateTime? _currentDay;
   late final ValueNotifier<List<Event>> _selectedEvents;
   CalendarFormat _calendarFormat = CalendarFormat.month;
   RangeSelectionMode _rangeSelectionMode = RangeSelectionMode
       .toggledOff; // Can be toggled on/off by longpressing a date
-  DateTime _focusedDay = DateTime.now();
-
+  DateTime _focusedDay = DateTime.utc(
+      DateTime.now().year, DateTime.now().month, DateTime.now().day);
+  final box = Hive.box('mybox');
   DateTime? _selectedDay;
   DateTime? _rangeStart;
   DateTime? _rangeEnd;
+  int forValueKey = 0;
 
   @override
   void initState() {
     super.initState();
+
+    kEvents = box.get('kEvents', defaultValue: <DateTime, List<Event>>{});
     _selectedDay = _focusedDay;
+    _currentDay = _selectedDay;
     _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
   }
 
   @override
   void dispose() {
     _selectedEvents.dispose();
+
+    box.put('kEvents', kEvents);
     super.dispose();
   }
 
   List<Event> _getEventsForDay(DateTime day) {
+    // print(day);
+    // print(kEvents[day]);
+    // print(day);
     // Implementation example
     return kEvents[day] ?? [];
   }
@@ -60,6 +74,7 @@ class _CalendarEventsState extends State<CalendarEvents> {
     if (!isSameDay(_selectedDay, selectedDay)) {
       setState(() {
         _selectedDay = selectedDay;
+        _currentDay = selectedDay;
         _focusedDay = focusedDay;
         _rangeStart = null; // Important to clean those
         _rangeEnd = null;
@@ -68,7 +83,6 @@ class _CalendarEventsState extends State<CalendarEvents> {
       _selectedEvents.value = _getEventsForDay(selectedDay);
       textController.text =
           DateFormat('yyyy/MM/dd').format(_selectedDay ?? DateTime.now());
-      _currentDay = selectedDay;
     }
   }
 
@@ -145,7 +159,7 @@ class _CalendarEventsState extends State<CalendarEvents> {
             ),
             const SizedBox(height: 0),
             Expanded(
-              child: _getEventsForDay(_selectedDay!).isEmpty
+              child: isEventEmpty(_selectedDay!)
                   ? Transform.translate(
                       offset: const Offset(0, 20),
                       child: Container(
@@ -213,9 +227,11 @@ class _CalendarEventsState extends State<CalendarEvents> {
                           ),
                         ),
                         child: ValueListenableBuilder<List<Event>>(
+                          key: ValueKey(forValueKey), //TODO:why no update?
                           valueListenable: _selectedEvents,
                           builder: (context, value, _) {
                             return ListView.builder(
+                              key: ValueKey(forValueKey),
                               padding: const EdgeInsets.all(0),
                               itemCount: value.length,
                               physics: const ScrollPhysics(),
@@ -282,6 +298,8 @@ class _CalendarEventsState extends State<CalendarEvents> {
         onPressed: () {
           textController.text =
               DateFormat('yyyy/MM/dd').format(_selectedDay ?? DateTime.now());
+          validateTitle = false;
+          titleTextController.text = "";
           showModalBottomSheet(
             shape: const RoundedRectangleBorder(
                 borderRadius:
@@ -330,8 +348,12 @@ class _CalendarEventsState extends State<CalendarEvents> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const TextField(
-                                decoration: InputDecoration(hintText: '제목'),
+                              TextField(
+                                controller: titleTextController,
+                                decoration: InputDecoration(
+                                  hintText: '제목',
+                                  errorText: validateTitle ? '값 입력' : null,
+                                ),
                               ),
                               const SizedBox(height: 15),
                               const Text(
@@ -341,6 +363,7 @@ class _CalendarEventsState extends State<CalendarEvents> {
                                 ),
                               ),
                               TextField(
+                                readOnly: true,
                                 controller: textController,
                                 showCursor: false,
                                 onTap: () => _selectDate(context),
@@ -357,10 +380,31 @@ class _CalendarEventsState extends State<CalendarEvents> {
                                   ElevatedButton(
                                     child: const Text('저장'),
                                     onPressed: () {
-                                      kEvents[DateTime(2023, 2, 27)]?.add(Event(
-                                          textController.text)); //이러면 안들어간다잉
-
-                                      Navigator.pop(context);
+                                      setState(
+                                        () {
+                                          if (titleTextController
+                                              .text.isEmpty) {
+                                            validateTitle = true;
+                                          } else {
+                                            validateTitle = false;
+                                            // print(_currentDay);
+                                            forValueKey++;
+                                            if (kEvents[_currentDay] == null) {
+                                              kEvents.addAll({
+                                                _currentDay!: [
+                                                  Event(
+                                                      titleTextController.text)
+                                                ]
+                                              });
+                                            } else {
+                                              kEvents[_currentDay]!.add(Event(
+                                                  titleTextController
+                                                      .text)); //이러면 안들어간다잉
+                                            }
+                                            Navigator.pop(context);
+                                          }
+                                        },
+                                      );
                                     },
                                   ),
                                 ],
@@ -415,5 +459,16 @@ class _CalendarEventsState extends State<CalendarEvents> {
         textController.text = DateFormat('yyyy/MM/dd').format(selected);
       });
     }
+  }
+}
+
+bool isEventEmpty(DateTime day) {
+  if (kEvents[day] == null) {
+    return true;
+  } else if (kEvents[day]!.isEmpty) {
+    return true;
+  } else {
+    // print(kEvents[day]);
+    return false;
   }
 }

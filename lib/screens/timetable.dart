@@ -237,7 +237,9 @@ class _MyWidgetState extends State<MyWidget> with TickerProviderStateMixin {
                                   CupertinoIcons.circle,
                                   // color: Colors.blue,
                                 ),
-                                onTap: () {},
+                                onTap: () {
+                                  //TODO:ONTAP GUHYUN
+                                },
                               ),
                             ),
                           );
@@ -324,6 +326,7 @@ class _MyWidgetState extends State<MyWidget> with TickerProviderStateMixin {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 12),
                     child: Swiper(
+                      index: DateTime.now().weekday,
                       key: ValueKey(repeatingEvents.length),
                       outer: true,
                       scale: 0.7,
