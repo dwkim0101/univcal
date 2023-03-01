@@ -19,6 +19,7 @@ void main() async {
 //TODO: LANDINGPAGE / MODIFY EVENT /
 //TODO: UPDATE SCREEN ERROR IN CALENDAR ADD + NO EVENTS / ERASE
 //TODO: 학.복습 날짜 바꾸어먹기
+//TODO: 에타 불러오기 페이지
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'UnivCal',
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,

@@ -152,21 +152,32 @@ class _StudyReminderViewState extends State<StudyReminderView> {
                                       DateTime.now().month,
                                       DateTime.now().day);
                                   int currentIndex = value[index].index;
-                                  value[index].reviewState[temp] =
-                                      !(value[index].reviewState[temp]!);
+                                  if (eventHandler(
+                                      value, index, value[index].repeatable)) {
+                                  } else {}
+
+                                  if (value[index].reviewState[temp] == null) {
+                                    value[index]
+                                        .reviewState
+                                        .addAll({temp: true});
+                                  } else {
+                                    value[index].reviewState[temp] =
+                                        !(value[index].reviewState[temp]!);
+                                  }
+
                                   //TODO: 왜 되는지 모르겠지만 일단 됨...?
 
-                                  // if (value[index].repeatable) {
-                                  //   convertedRepeatingEvents[currentIndex]
-                                  //           .reviewState[temp] =
-                                  //       !convertedRepeatingEvents[currentIndex]
-                                  //           .reviewState[temp]!;
-                                  // } else {
-                                  //   dailyEvents[currentIndex]
-                                  //           .reviewState[temp] =
-                                  //       !dailyEvents[currentIndex]
-                                  //           .reviewState[temp]!;
-                                  // }
+                                  if (value[index].repeatable) {
+                                    convertedRepeatingEvents[currentIndex]
+                                            .reviewState[temp] =
+                                        !convertedRepeatingEvents[currentIndex]
+                                            .reviewState[temp]!;
+                                  } else {
+                                    dailyEvents[currentIndex]
+                                            .reviewState[temp] =
+                                        !dailyEvents[currentIndex]
+                                            .reviewState[temp]!;
+                                  }
                                 })
                               },
                               title: Text(
@@ -508,6 +519,7 @@ bool eventHandler(List<Event> value, int index, bool isRepeatable) {
   DateTime temp = DateTime.utc(
       DateTime.now().year, DateTime.now().month, DateTime.now().day);
   int currentIndex = value[index].index;
+
   if (isRepeatable) {
     if (convertedRepeatingEvents[currentIndex].reviewState[temp] == null) {
       convertedRepeatingEvents[currentIndex].reviewState.addAll({temp: false});

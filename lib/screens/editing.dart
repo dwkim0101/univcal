@@ -48,7 +48,6 @@ class _EditPageState extends State<EditPage> {
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
                     border: Border(
                       bottom: BorderSide(
                         color: Colors.grey.shade300,
