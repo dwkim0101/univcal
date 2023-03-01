@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:univcal/screens/home.dart';
+// import 'package:univcal/screens/home.dart';
 import 'package:univcal/utils.dart';
+import './screens/onboarding/onboarding_screen.dart';
 
 void main() async {
   Hive.registerAdapter(RepeatableEventAdapter());
@@ -42,7 +43,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const Home(),
+      // home: const Home(),
+      home: const OnboardingScreen(),
     );
   }
 }

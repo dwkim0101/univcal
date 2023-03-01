@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
@@ -157,7 +158,15 @@ class _EditPageState extends State<EditPage> {
                                         ' ${DateFormat('yy/MM/dd').format(repeatingEvents[index].endDay)}'),
                                     onTap: () {
                                       flutterDialog(context, true, index);
-                                      setState(() {});
+                                      setState(() {
+                                        box.put(
+                                            'repeatingEvents', repeatingEvents);
+                                        box.put('dailyEvents', dailyEvents);
+                                        box.put('convertedRepeatingEvents',
+                                            convertedRepeatingEvents);
+                                        box.put('currentParentIndex',
+                                            currentParentIndex);
+                                      });
                                     },
                                   ),
                                 ),
@@ -220,6 +229,14 @@ class _EditPageState extends State<EditPage> {
                                     onTap: () {
                                       setState(() {
                                         flutterDialog(context, false, index);
+
+                                        box.put(
+                                            'repeatingEvents', repeatingEvents);
+                                        box.put('dailyEvents', dailyEvents);
+                                        box.put('convertedRepeatingEvents',
+                                            convertedRepeatingEvents);
+                                        box.put('currentParentIndex',
+                                            currentParentIndex);
                                       });
                                     },
                                   ),
@@ -244,75 +261,55 @@ void flutterDialog(BuildContext context, bool isRepeatAble, int index) {
       //barrierDismissible - Dialog를 제외한 다른 화면 터치 x
       barrierDismissible: true,
       builder: (BuildContext context) {
-        return AlertDialog(
-          // RoundedRectangleBorder - Dialog 화면 모서리 둥글게 조절
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
-          //Dialog Main Title
-          title: Column(
-            children: const <Widget>[
-              Text("정말로 삭제하시겠습니까?"),
-            ],
-          ),
-          //
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              ButtonBar(
-                children: [
-                  ElevatedButton(
-                    child: const Text("취소"),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  ElevatedButton(
-                    child: const Text("확인"),
-                    onPressed: () {
-                      if (isRepeatAble) {
-                        // var length = convertedRepeatingEvents.length;
-                        for (var i = 0;
-                            i < convertedRepeatingEvents.length;
-                            i++) {
-                          if (repeatingEvents[index].index ==
-                              convertedRepeatingEvents[i].parentIndex) {
-                            // convertedRepeatingEvents[i + 1].index = i;
-                            convertedRepeatingEvents.removeAt(i);
-                            i--;
-                          }
-                        }
-                        for (var i = 0;
-                            i < convertedRepeatingEvents.length;
-                            i++) {
-                          convertedRepeatingEvents[i].index = i;
-                        }
-                        repeatingEvents.removeAt(index);
-                      } else {
-                        dailyEvents.removeAt(index);
-                        for (int i = 0; i < dailyEvents.length; i++) {
-                          dailyEvents[i].index = i;
-                        }
+        return CupertinoAlertDialog(
+            //Dialog Main Title
+            title: const Text("확인"),
+            content: const Text('정말로 삭제하시겠습니까?'),
+            actions: [
+              CupertinoDialogAction(
+                child: const Text("취소"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              CupertinoDialogAction(
+                child: const Text("확인"),
+                onPressed: () {
+                  if (isRepeatAble) {
+                    // var length = convertedRepeatingEvents.length;
+                    for (var i = 0; i < convertedRepeatingEvents.length; i++) {
+                      if (repeatingEvents[index].index ==
+                          convertedRepeatingEvents[i].parentIndex) {
+                        // convertedRepeatingEvents[i + 1].index = i;
+                        convertedRepeatingEvents.removeAt(i);
+                        i--;
                       }
-                      final snackBar = SnackBar(
-                        content: const Text('삭제가 완료되었습니다.'),
-                        action: SnackBarAction(
-                          label: '확인',
-                          onPressed: () {},
-                        ),
-                      );
-                      // Find the ScaffoldMessenger in the widget tree
-                      // and use it to show a SnackBar.
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    }
+                    for (var i = 0; i < convertedRepeatingEvents.length; i++) {
+                      convertedRepeatingEvents[i].index = i;
+                    }
+                    repeatingEvents.removeAt(index);
+                  } else {
+                    dailyEvents.removeAt(index);
+                    for (int i = 0; i < dailyEvents.length; i++) {
+                      dailyEvents[i].index = i;
+                    }
+                  }
+                  final snackBar = SnackBar(
+                    content: const Text('삭제가 완료되었습니다.'),
+                    action: SnackBarAction(
+                      label: '확인',
+                      onPressed: () {},
+                    ),
+                  );
+                  // Find the ScaffoldMessenger in the widget tree
+                  // and use it to show a SnackBar.
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
-                      kEventUpdate();
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-              )
-            ],
-          ),
-        );
+                  kEventUpdate();
+                  Navigator.pop(context);
+                },
+              ),
+            ]);
       });
 }
