@@ -29,6 +29,7 @@ class _CalendarEventsState extends State<CalendarEvents> {
       .toggledOff; // Can be toggled on/off by longpressing a date
   DateTime _focusedDay = DateTime.utc(
       DateTime.now().year, DateTime.now().month, DateTime.now().day);
+
   final box = Hive.box('mybox2');
   DateTime? _selectedDay;
   DateTime? _rangeStart;
@@ -280,6 +281,12 @@ class _CalendarEventsState extends State<CalendarEvents> {
                                             }
                                           }
                                         }
+
+                                        box.put(
+                                            'repeatingEvents', repeatingEvents);
+                                        box.put('dailyEvents', dailyEvents);
+                                        box.put('convertedRepeatingEvents',
+                                            convertedRepeatingEvents);
                                       })
                                     },
                                     title: Text(
@@ -433,6 +440,12 @@ class _CalendarEventsState extends State<CalendarEvents> {
                                               date: _currentDay!,
                                               index: dailyEvents.length,
                                             ));
+
+                                            box.put('repeatingEvents',
+                                                repeatingEvents);
+                                            box.put('dailyEvents', dailyEvents);
+                                            box.put('convertedRepeatingEvents',
+                                                convertedRepeatingEvents);
                                             Navigator.pop(context);
                                           }
                                         },

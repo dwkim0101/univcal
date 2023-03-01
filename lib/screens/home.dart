@@ -52,7 +52,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         defaultValue: <NonRepeatableEvent>[]).cast<NonRepeatableEvent>();
     convertedRepeatingEvents = box.get('convertedRepeatingEvents',
         defaultValue: <NonRepeatableEvent>[]).cast<NonRepeatableEvent>();
-
+    currentParentIndex =
+        box.get('currentParentIndex', defaultValue: repeatingEvents.length);
     kEventUpdate();
     // kEvents = LinkedHashMap<DateTime, List<Event>>.from(
     // tempMap<DateTime, List<Event>>)
@@ -63,7 +64,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   @override
   void dispose() {
     _tabController.dispose();
-
+    box.put('currentParentIndex', currentParentIndex);
     box.put('repeatingEvents', repeatingEvents);
     box.put('dailyEvents', dailyEvents);
     box.put('convertedRepeatingEvents', convertedRepeatingEvents);

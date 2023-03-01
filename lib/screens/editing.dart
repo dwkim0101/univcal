@@ -18,6 +18,12 @@ class _EditPageState extends State<EditPage> {
   void initState() {
     repeatingEvents.sort(((a, b) => a.startDay.compareTo(b.startDay)));
     dailyEvents.sort(((a, b) => a.date.compareTo(b.date)));
+
+    for (int i = 0; i < dailyEvents.length; i++) {
+      // print(dailyEvents[i].index);
+      dailyEvents[i].index = i;
+      // print(dailyEvents[i].index);
+    }
     super.initState();
   }
 
@@ -26,6 +32,7 @@ class _EditPageState extends State<EditPage> {
     box.put('repeatingEvents', repeatingEvents);
     box.put('dailyEvents', dailyEvents);
     box.put('convertedRepeatingEvents', convertedRepeatingEvents);
+    box.put('currentParentIndex', currentParentIndex);
     super.dispose();
   }
 
@@ -264,19 +271,40 @@ void flutterDialog(BuildContext context, bool isRepeatAble, int index) {
                     child: const Text("확인"),
                     onPressed: () {
                       if (isRepeatAble) {
+                        // var length = convertedRepeatingEvents.length;
                         for (var i = 0;
                             i < convertedRepeatingEvents.length;
                             i++) {
                           if (repeatingEvents[index].index ==
                               convertedRepeatingEvents[i].parentIndex) {
+                            // convertedRepeatingEvents[i + 1].index = i;
                             convertedRepeatingEvents.removeAt(i);
                             i--;
                           }
                         }
+                        for (var i = 0;
+                            i < convertedRepeatingEvents.length;
+                            i++) {
+                          convertedRepeatingEvents[i].index = i;
+                        }
                         repeatingEvents.removeAt(index);
                       } else {
                         dailyEvents.removeAt(index);
+                        for (int i = 0; i < dailyEvents.length; i++) {
+                          dailyEvents[i].index = i;
+                        }
                       }
+                      final snackBar = SnackBar(
+                        content: const Text('삭제가 완료되었습니다.'),
+                        action: SnackBarAction(
+                          label: '확인',
+                          onPressed: () {},
+                        ),
+                      );
+                      // Find the ScaffoldMessenger in the widget tree
+                      // and use it to show a SnackBar.
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
                       kEventUpdate();
                       Navigator.pop(context);
                     },

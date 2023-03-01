@@ -10,6 +10,8 @@ import 'package:table_calendar/table_calendar.dart';
 part 'utils.g.dart';
 
 final box = Hive.openBox('mybox2');
+int currentParentIndex = 0;
+bool isAdded = false;
 
 /// Example event class.
 @HiveType(typeId: 0)
@@ -78,7 +80,7 @@ class NonRepeatableEvent {
   @HiveField(3)
   Map<DateTime, bool> reviewState = {};
   @HiveField(4)
-  final int index;
+  int index;
   @HiveField(5)
   int? parentIndex;
 

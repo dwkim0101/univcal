@@ -33,6 +33,7 @@ class _MyWidgetState extends State<MyWidget> with TickerProviderStateMixin {
     box.put('repeatingEvents', repeatingEvents);
     box.put('dailyEvents', dailyEvents);
     box.put('convertedRepeatingEvents', convertedRepeatingEvents);
+    box.put('currentParentIndex', currentParentIndex);
     super.dispose();
   }
 
@@ -138,7 +139,7 @@ class _MyWidgetState extends State<MyWidget> with TickerProviderStateMixin {
                           builder: (context) => const EventAddScreen(),
                         ).then((value) => {
                               setState(() {
-                                if (currentLength != repeatingEvents.length) {
+                                if (isAdded) {
                                   var _ = repeatingEvents[
                                       repeatingEvents.length - 1];
                                   for (int i = 0; i < 7; i++) {
@@ -171,7 +172,7 @@ class _MyWidgetState extends State<MyWidget> with TickerProviderStateMixin {
                                     }
                                   }
                                   kEventUpdate();
-                                  currentLength = repeatingEvents.length;
+                                  isAdded = false;
                                 }
                               })
                             }),

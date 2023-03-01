@@ -152,9 +152,6 @@ class _StudyReminderViewState extends State<StudyReminderView> {
                                       DateTime.now().month,
                                       DateTime.now().day);
                                   int currentIndex = value[index].index;
-                                  if (eventHandler(
-                                      value, index, value[index].repeatable)) {
-                                  } else {}
 
                                   if (value[index].reviewState[temp] == null) {
                                     value[index]
@@ -168,16 +165,25 @@ class _StudyReminderViewState extends State<StudyReminderView> {
                                   //TODO: 왜 되는지 모르겠지만 일단 됨...?
 
                                   if (value[index].repeatable) {
-                                    convertedRepeatingEvents[currentIndex]
-                                            .reviewState[temp] =
-                                        !convertedRepeatingEvents[currentIndex]
-                                            .reviewState[temp]!;
+                                    // convertedRepeatingEvents[currentIndex]
+                                    //         .reviewState[temp] =
+                                    //     !convertedRepeatingEvents[currentIndex]
+                                    //         .reviewState[temp]!;
+                                    print(convertedRepeatingEvents[currentIndex]
+                                        .reviewState[temp]);
                                   } else {
                                     dailyEvents[currentIndex]
                                             .reviewState[temp] =
-                                        !dailyEvents[currentIndex]
+                                        dailyEvents[currentIndex]
                                             .reviewState[temp]!;
                                   }
+
+                                  box.put(
+                                      'currentReviewDays', currentReviewDays);
+                                  box.put('repeatingEvents', repeatingEvents);
+                                  box.put('dailyEvents', dailyEvents);
+                                  box.put('convertedRepeatingEvents',
+                                      convertedRepeatingEvents);
                                 })
                               },
                               title: Text(
@@ -444,6 +450,15 @@ class _StudyReminderViewState extends State<StudyReminderView> {
                                               }
                                               validate = List.filled(6, false);
                                               super.setState(() {
+                                                box.put('currentReviewDays',
+                                                    currentReviewDays);
+                                                box.put('repeatingEvents',
+                                                    repeatingEvents);
+                                                box.put(
+                                                    'dailyEvents', dailyEvents);
+                                                box.put(
+                                                    'convertedRepeatingEvents',
+                                                    convertedRepeatingEvents);
                                                 Navigator.pop(context);
                                               });
                                             }
@@ -524,11 +539,15 @@ bool eventHandler(List<Event> value, int index, bool isRepeatable) {
     if (convertedRepeatingEvents[currentIndex].reviewState[temp] == null) {
       convertedRepeatingEvents[currentIndex].reviewState.addAll({temp: false});
     }
-    return convertedRepeatingEvents[currentIndex].reviewState[temp]!;
   } else {
     if (dailyEvents[currentIndex].reviewState[temp] == null) {
       dailyEvents[currentIndex].reviewState.addAll({temp: false});
     }
-    return dailyEvents[currentIndex].reviewState[temp]!;
+
+    // print(dailyEvents[currentIndex]);
   }
+  if (value[index].reviewState[temp] == null) {
+    value[index].reviewState.addAll({temp: false});
+  }
+  return value[index].reviewState[temp]!;
 }

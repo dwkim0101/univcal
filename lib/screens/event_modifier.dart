@@ -68,6 +68,7 @@ class EventAddScreenState extends State<EventAddScreen> {
     box.put('repeatingEvents', repeatingEvents);
     box.put('dailyEvents', dailyEvents);
     box.put('convertedRepeatingEvents', convertedRepeatingEvents);
+    box.put('currentParentIndex', currentParentIndex);
     // for (RepeatableEvent _ in repeatingEvents) {
     //   _.printNewClass();
     // }
@@ -185,6 +186,7 @@ class EventAddScreenState extends State<EventAddScreen> {
                   ElevatedButton(
                     child: const Text('취소'),
                     onPressed: () {
+                      isAdded = false;
                       Navigator.pop(context);
                     },
                   ),
@@ -194,17 +196,24 @@ class EventAddScreenState extends State<EventAddScreen> {
                       setState(() {
                         if (titleTextController.text.isEmpty) {
                           validateTitle = true;
+                          isAdded = false;
                         } else {
                           validateTitle = false;
 
                           repeatingEvents.add(RepeatableEvent(
-                            index: repeatingEvents.length,
+                            index: currentParentIndex,
                             title: titleTextController.text,
                             startDay: _startDay,
                             endDay: _endDay,
                             repeatWeekdays: _selectedWeekdays,
                           ));
-
+                          isAdded = true;
+                          currentParentIndex++;
+                          box.put('currentParentIndex', currentParentIndex);
+                          box.put('repeatingEvents', repeatingEvents);
+                          box.put('dailyEvents', dailyEvents);
+                          box.put('convertedRepeatingEvents',
+                              convertedRepeatingEvents);
                           Navigator.pop(context);
                         }
                       });
