@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-// import 'package:univcal/screens/home.dart';
+import 'package:univcal/screens/home.dart';
 import 'package:univcal/utils.dart';
 import './screens/onboarding/onboarding_screen.dart';
 
@@ -22,8 +22,20 @@ void main() async {
 //TODO: 학.복습 날짜 바꾸어먹기
 //TODO: 에타 불러오기 페이지
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final box = Hive.box('mybox2');
+  @override
+  void initState() {
+    isFirstLoading = box.get('ifFirstLoading', defaultValue: false);
+    super.initState();
+  }
 
   // This widget is the root of your application.
   @override
@@ -43,8 +55,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      // home: const Home(),
-      home: const OnboardingScreen(),
+      home: isFirstLoading ? const Home() : const OnboardingScreen(),
     );
   }
 }

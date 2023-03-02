@@ -39,6 +39,8 @@ class _MyWidgetState extends State<MyWidget> with TickerProviderStateMixin {
 
   @override
   void initState() {
+    print(isFirstLoading);
+    // print(DateTime.now().weekday);
     // box.delete('kEvents');
     // box.delete('convertedRepeatingEvents');
     // box.delete('repeatingEvents');
@@ -352,7 +354,7 @@ class _MyWidgetState extends State<MyWidget> with TickerProviderStateMixin {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 12),
                     child: Swiper(
-                      index: DateTime.now().weekday,
+                      index: DateTime.now().weekday - 1, //TODO:
                       key: ValueKey(repeatingEvents.length),
                       outer: true,
                       scale: 0.7,

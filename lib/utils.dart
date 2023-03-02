@@ -12,6 +12,7 @@ part 'utils.g.dart';
 final box = Hive.openBox('mybox2');
 int currentParentIndex = 0;
 bool isAdded = false;
+bool isFirstLoading = false;
 
 /// Example event class.
 @HiveType(typeId: 0)

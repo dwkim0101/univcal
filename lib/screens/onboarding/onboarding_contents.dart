@@ -17,14 +17,13 @@ List<OnboardingContents> contents = [
     desc: "수업듣고 또 복습하고 정신은 하나도 없는데\n매번 새로 손수 일정짜기 귀찮으셨죠?",
   ),
   OnboardingContents(
-    title: "그런 당신을 위해",
+    title: "복습을 도와드릴게요!",
     image: "assets/images/image2.png",
-    desc: "지금부터 해야할 복습 루틴\n함께 만들어드릴게요!",
+    desc: "",
   ),
   OnboardingContents(
-    title: "Get notified when work happens",
+    title: "그러면 이제\n시작해볼까요?",
     image: "assets/images/image3.png",
-    desc:
-        "Take control of notifications, collaborate live or on your own time.",
+    desc: "아래 버튼을 눌러 시작해봐요 !",
   ),
 ];
