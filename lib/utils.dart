@@ -12,7 +12,7 @@ part 'utils.g.dart';
 final box = Hive.openBox('mybox2');
 int currentParentIndex = 0;
 bool isAdded = false;
-bool isFirstLoading = false;
+bool? isFirstLoading;
 
 /// Example event class.
 @HiveType(typeId: 0)
@@ -29,6 +29,8 @@ class Event {
   final bool repeatable;
   @HiveField(4)
   final int index;
+  @HiveField(5)
+  String? whatDidYouLearn;
 
   Event({
     required this.title,
@@ -36,6 +38,7 @@ class Event {
     required this.reviewState,
     required this.repeatable,
     required this.index,
+    this.whatDidYouLearn,
   });
 
   @override
@@ -85,11 +88,15 @@ class NonRepeatableEvent {
   @HiveField(5)
   int? parentIndex;
 
+  @HiveField(6)
+  String? whatDidYouLearn;
+
   NonRepeatableEvent({
     required this.title,
     required this.date,
     required this.index,
     this.parentIndex,
+    this.whatDidYouLearn,
   });
 
   @override
@@ -155,6 +162,7 @@ void kEventUpdate() {
           )
         ]
       });
+      kEvents[_.date];
     } else {
       // print('nulln');
       kEvents[_.date]?.add(Event(

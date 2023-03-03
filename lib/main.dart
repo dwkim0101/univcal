@@ -33,7 +33,8 @@ class _MyAppState extends State<MyApp> {
   final box = Hive.box('mybox2');
   @override
   void initState() {
-    isFirstLoading = box.get('ifFirstLoading', defaultValue: false);
+    isFirstLoading = box.get('isFirstLoading', defaultValue: false);
+    //isFirstLoading = true; //WHEN YOU WANT TO SEE ONBOARDING PAGE
     super.initState();
   }
 
@@ -55,7 +56,7 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: isFirstLoading ? const Home() : const OnboardingScreen(),
+      home: isFirstLoading! ? const Home() : const OnboardingScreen(),
     );
   }
 }

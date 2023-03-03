@@ -45,7 +45,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     // repeatingEvents = [];
     // convertedRepeatingEvents = [];
     // dailyEvents = [];
-
+    box.put('isFirstLoading', isFirstLoading);
     repeatingEvents = box.get('repeatingEvents',
         defaultValue: <RepeatableEvent>[]).cast<RepeatableEvent>();
     dailyEvents = box.get('dailyEvents',

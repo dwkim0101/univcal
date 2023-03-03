@@ -247,6 +247,7 @@ class _CalendarEventsState extends State<CalendarEvents> {
                                             width: 1.5, color: Colors.white)),
                                   ),
                                   child: ListTile(
+                                    subtitle: const Text('asd'),
                                     // enableFeedback: true,
                                     // selectedTileColor: Colors.blueAccent,
                                     trailing: value[index].checkState

@@ -22,13 +22,13 @@ class EventAdapter extends TypeAdapter<Event> {
       reviewState: (fields[2] as Map).cast<DateTime, bool>(),
       repeatable: fields[3] as bool,
       index: fields[4] as int,
-    );
+    )..whatDidYouLearn = fields[5] as String?;
   }
 
   @override
   void write(BinaryWriter writer, Event obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.title)
       ..writeByte(1)
@@ -38,7 +38,9 @@ class EventAdapter extends TypeAdapter<Event> {
       ..writeByte(3)
       ..write(obj.repeatable)
       ..writeByte(4)
-      ..write(obj.index);
+      ..write(obj.index)
+      ..writeByte(5)
+      ..write(obj.whatDidYouLearn);
   }
 
   @override
@@ -115,13 +117,14 @@ class NonRepeatableEventAdapter extends TypeAdapter<NonRepeatableEvent> {
       parentIndex: fields[5] as int?,
     )
       ..checkState = fields[2] as bool
-      ..reviewState = (fields[3] as Map).cast<DateTime, bool>();
+      ..reviewState = (fields[3] as Map).cast<DateTime, bool>()
+      ..whatDidYouLearn = fields[6] as String?;
   }
 
   @override
   void write(BinaryWriter writer, NonRepeatableEvent obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.title)
       ..writeByte(1)
@@ -133,7 +136,9 @@ class NonRepeatableEventAdapter extends TypeAdapter<NonRepeatableEvent> {
       ..writeByte(4)
       ..write(obj.index)
       ..writeByte(5)
-      ..write(obj.parentIndex);
+      ..write(obj.parentIndex)
+      ..writeByte(6)
+      ..write(obj.whatDidYouLearn);
   }
 
   @override
