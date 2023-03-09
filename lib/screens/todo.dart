@@ -186,7 +186,9 @@ class _StudyReminderViewState extends State<StudyReminderView> {
                                       convertedRepeatingEvents);
                                 })
                               },
-                              subtitle: Text('${value[index].whatDidYouLearn}'),
+                              subtitle: value[index].whatDidYouLearn == null
+                                  ? null
+                                  : Text('${value[index].whatDidYouLearn}'),
                               title: Text(
                                 '${value[index]}',
                                 style: TextStyle(

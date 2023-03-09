@@ -261,12 +261,10 @@ class _CalendarEventsState extends State<CalendarEvents> {
                                             color: Colors.white,
                                           ),
                                     onTap: () async {
-                                      var resultLabel = "";
+                                      String? resultLabel;
                                       if (!value[index].checkState) {
                                         resultLabel =
-                                            await _showTextInputDialog(
-                                                    context) ??
-                                                "";
+                                            await _showTextInputDialog(context);
                                         value[index].whatDidYouLearn =
                                             resultLabel;
                                       }
@@ -321,12 +319,11 @@ class _CalendarEventsState extends State<CalendarEvents> {
                                         decorationThickness: 2,
                                       ),
                                     ),
-                                    subtitle: value[index].whatDidYouLearn !=
-                                                Null &&
-                                            value[index].checkState
-                                        ? Text(
-                                            '${value[index].whatDidYouLearn}')
-                                        : null,
+                                    subtitle: value[index].whatDidYouLearn ==
+                                            null
+                                        ? null
+                                        : Text(
+                                            '${value[index].whatDidYouLearn}'),
                                   ),
                                 );
                               },
@@ -529,28 +526,48 @@ class _CalendarEventsState extends State<CalendarEvents> {
 
   Future<String?> _showTextInputDialog(BuildContext context) async {
     final textFieldController = TextEditingController();
+    bool textFieldIsEmpty = true;
     return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text('학습 도우미'),
-            content: TextField(
-              controller: textFieldController,
-              decoration: const InputDecoration(hintText: "오늘 학습한 내용은 무엇인가요?"),
-            ),
-            actions: <Widget>[
-              ElevatedButton(
-                child: const Text("취소"),
-                onPressed: () => Navigator.pop(context),
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          // title: const Text('학습 도우미'),
+
+          content: StatefulBuilder(builder: (__, StateSetter setState) {
+            return Container(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: textFieldController,
+                    decoration: InputDecoration(
+                      hintText: "오늘 학습한 내용은 무엇인가요?",
+                      errorText: textFieldIsEmpty ? null : "값을 입력해주세요.",
+                    ),
+                  ),
+                  ButtonBar(
+                    children: [
+                      TextButton(
+                          child: const Text('저장'),
+                          onPressed: () {
+                            if (textFieldController.text.isEmpty) {
+                              setState(() {
+                                textFieldIsEmpty = false;
+                              });
+                            } else {
+                              textFieldIsEmpty = true;
+                              Navigator.pop(context, textFieldController.text);
+                            }
+                          }),
+                    ],
+                  ),
+                ],
               ),
-              ElevatedButton(
-                child: const Text('완료'),
-                onPressed: () =>
-                    Navigator.pop(context, textFieldController.text),
-              ),
-            ],
-          );
-        });
+            );
+          }),
+        );
+      },
+    );
   }
 }
 
