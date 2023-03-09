@@ -34,7 +34,8 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     isFirstLoading = box.get('isFirstLoading', defaultValue: false);
-    //isFirstLoading = true; //WHEN YOU WANT TO SEE ONBOARDING PAGE
+
+    isFirstLoading = false; //WHEN YOU WANT TO SEE ONBOARDING PAGE
     super.initState();
   }
 
