@@ -430,8 +430,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 Navigator.push(
                                   context,
                                   CupertinoPageRoute(
+                                      maintainState: false,
                                       builder: (context) => const Home()),
                                 );
+                                // WillPopScope( //TODO: 아직 이상해
+                                //     child: const Home(),
+                                //     onWillPop: () async => false);
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.black,

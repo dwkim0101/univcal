@@ -41,6 +41,10 @@ class Event {
     this.whatDidYouLearn,
   });
 
+  void updateWhatILearned(String whatILearned) {
+    whatDidYouLearn = whatILearned;
+  }
+
   @override
   String toString() => title;
 }
@@ -98,6 +102,10 @@ class NonRepeatableEvent {
     this.parentIndex,
     this.whatDidYouLearn,
   });
+
+  void updateWhatILearned(String whatILearned) {
+    whatDidYouLearn = whatILearned;
+  }
 
   @override
   String toString() => title;
@@ -159,18 +167,20 @@ void kEventUpdate() {
             reviewState: _.reviewState,
             repeatable: true,
             index: _.index,
+            whatDidYouLearn: _.whatDidYouLearn,
           )
         ]
       });
-      kEvents[_.date];
     } else {
       // print('nulln');
       kEvents[_.date]?.add(Event(
-          title: _.title,
-          checkState: _.checkState,
-          reviewState: _.reviewState,
-          repeatable: true,
-          index: _.index));
+        title: _.title,
+        checkState: _.checkState,
+        reviewState: _.reviewState,
+        repeatable: true,
+        index: _.index,
+        whatDidYouLearn: _.whatDidYouLearn,
+      ));
     }
   }
   // print(kEvents);
@@ -184,9 +194,11 @@ void kEventUpdate() {
             reviewState: _.reviewState,
             repeatable: false,
             index: _.index,
+            whatDidYouLearn: _.whatDidYouLearn,
           )
         ]
       });
+      // kEvents[_.date][0]! =
     } else {
       kEvents[_.date]?.add(
         Event(
@@ -195,6 +207,7 @@ void kEventUpdate() {
           reviewState: _.reviewState,
           repeatable: false,
           index: _.index,
+          whatDidYouLearn: _.whatDidYouLearn,
         ),
       );
     }

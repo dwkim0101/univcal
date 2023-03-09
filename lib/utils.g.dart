@@ -22,7 +22,8 @@ class EventAdapter extends TypeAdapter<Event> {
       reviewState: (fields[2] as Map).cast<DateTime, bool>(),
       repeatable: fields[3] as bool,
       index: fields[4] as int,
-    )..whatDidYouLearn = fields[5] as String?;
+      whatDidYouLearn: fields[5] as String?,
+    );
   }
 
   @override
@@ -115,10 +116,10 @@ class NonRepeatableEventAdapter extends TypeAdapter<NonRepeatableEvent> {
       date: fields[1] as DateTime,
       index: fields[4] as int,
       parentIndex: fields[5] as int?,
+      whatDidYouLearn: fields[6] as String?,
     )
       ..checkState = fields[2] as bool
-      ..reviewState = (fields[3] as Map).cast<DateTime, bool>()
-      ..whatDidYouLearn = fields[6] as String?;
+      ..reviewState = (fields[3] as Map).cast<DateTime, bool>();
   }
 
   @override

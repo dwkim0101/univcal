@@ -247,7 +247,7 @@ class _CalendarEventsState extends State<CalendarEvents> {
                                             width: 1.5, color: Colors.white)),
                                   ),
                                   child: ListTile(
-                                    subtitle: const Text('asd'),
+                                    // subtitle: const Text('asd'),
                                     // enableFeedback: true,
                                     // selectedTileColor: Colors.blueAccent,
                                     trailing: value[index].checkState
@@ -260,8 +260,20 @@ class _CalendarEventsState extends State<CalendarEvents> {
                                             CupertinoIcons.circle,
                                             color: Colors.white,
                                           ),
-                                    onTap: () => {
+                                    onTap: () async {
+                                      var resultLabel = "";
+                                      if (!value[index].checkState) {
+                                        resultLabel =
+                                            await _showTextInputDialog(
+                                                    context) ??
+                                                "";
+                                        value[index].whatDidYouLearn =
+                                            resultLabel;
+                                      }
+
                                       setState(() {
+                                        //TODO: 복습 라벨링
+
                                         value[index].checkState =
                                             !(value[index].checkState);
                                         if (value[index].repeatable) {
@@ -270,6 +282,7 @@ class _CalendarEventsState extends State<CalendarEvents> {
                                             //인덱스를 확실하게 알기 어려운게, 소팅을 해버리면,,,
                                             if (_.index == value[index].index) {
                                               _.checkState = !_.checkState;
+                                              _.whatDidYouLearn = resultLabel;
                                               break;
                                             }
                                           }
@@ -278,6 +291,7 @@ class _CalendarEventsState extends State<CalendarEvents> {
                                             //인덱스를 확실하게 알기 어려운게, 소팅을 해버리면,,,
                                             if (_.index == value[index].index) {
                                               _.checkState = !_.checkState;
+                                              _.whatDidYouLearn = resultLabel;
                                               break;
                                             }
                                           }
@@ -288,7 +302,7 @@ class _CalendarEventsState extends State<CalendarEvents> {
                                         box.put('dailyEvents', dailyEvents);
                                         box.put('convertedRepeatingEvents',
                                             convertedRepeatingEvents);
-                                      })
+                                      });
                                     },
                                     title: Text(
                                       '${value[index]}',
@@ -307,6 +321,12 @@ class _CalendarEventsState extends State<CalendarEvents> {
                                         decorationThickness: 2,
                                       ),
                                     ),
+                                    subtitle: value[index].whatDidYouLearn !=
+                                                Null &&
+                                            value[index].checkState
+                                        ? Text(
+                                            '${value[index].whatDidYouLearn}')
+                                        : null,
                                   ),
                                 );
                               },
@@ -505,6 +525,32 @@ class _CalendarEventsState extends State<CalendarEvents> {
         textController.text = DateFormat('yyyy/MM/dd').format(selected);
       });
     }
+  }
+
+  Future<String?> _showTextInputDialog(BuildContext context) async {
+    final textFieldController = TextEditingController();
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('학습 도우미'),
+            content: TextField(
+              controller: textFieldController,
+              decoration: const InputDecoration(hintText: "오늘 학습한 내용은 무엇인가요?"),
+            ),
+            actions: <Widget>[
+              ElevatedButton(
+                child: const Text("취소"),
+                onPressed: () => Navigator.pop(context),
+              ),
+              ElevatedButton(
+                child: const Text('완료'),
+                onPressed: () =>
+                    Navigator.pop(context, textFieldController.text),
+              ),
+            ],
+          );
+        });
   }
 }
 
